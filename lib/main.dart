@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -35,35 +37,34 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+List<TimeStampedSensorValues> generateWavySensorData(
+    int rows, int cols, int totalDurationMillis, int intervalMillis) {
+  int numDataPoints = totalDurationMillis ~/ intervalMillis;
+  List<TimeStampedSensorValues> sensorData = [];
+  DateTime startTime = DateTime.now();
+
+  for (int k = 0; k < numDataPoints; k++) {
+    DateTime timestamp =
+        startTime.add(Duration(milliseconds: k * intervalMillis));
+    List<List<double>> sensorValues = List.generate(
+      rows,
+      (i) => List.generate(
+        cols,
+        (j) => (0.5 + 0.5 * sin(2 * pi * (i + j + k) / 10)), // Wavy pattern
+      ),
+    );
+    sensorData.add(TimeStampedSensorValues(
+        timestamp: timestamp, sensorValues: sensorValues));
+  }
+
+  return sensorData;
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    List<TimeStampedSensorValues> sensorData = [
-      TimeStampedSensorValues(
-        timestamp: DateTime.now().subtract(const Duration(seconds: 10)),
-        sensorValues: List.generate(
-          10,
-          (i) => List.generate(10, (j) => (i + j) / 20.0),
-        ),
-      ),
-      TimeStampedSensorValues(
-        timestamp: DateTime.now().subtract(const Duration(seconds: 5)),
-        sensorValues: List.generate(
-          10,
-          (i) => List.generate(10, (j) => (i + j) / 30.0),
-        ),
-      ),
-      TimeStampedSensorValues(
-        timestamp: DateTime.now(),
-        sensorValues: List.generate(
-          10,
-          (i) => List.generate(10, (j) => (i + j) / 40.0),
-        ),
-      ),
-    ];
-
-    print(sensorData[0].timestamp);
-    print(sensorData[1].timestamp);
+    List<TimeStampedSensorValues> sensorData =
+        generateWavySensorData(10, 10, 10000, 100);
 
     return Scaffold(
         body: Row(

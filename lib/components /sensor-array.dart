@@ -32,8 +32,8 @@ class SensorArray extends StatefulWidget {
 }
 
 class _SensorArrayState extends State<SensorArray> {
-  int _currentDataIndex = 0;
-  Timer? _timer;
+  late Timer _timer;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -42,23 +42,33 @@ class _SensorArrayState extends State<SensorArray> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
-      setState(() {
-        _currentDataIndex = (_currentDataIndex + 1) % widget.sensorData.length;
-      });
+    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      if (_currentIndex >= widget.sensorData.length - 1) {
+        _timer.cancel();
+      } else {
+        setState(() {
+          _currentIndex++;
+        });
+      }
     });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _timer.cancel();
     super.dispose();
+  }
+
+  List<List<double>> _getCurrentSensorValues() {
+    if (_currentIndex < widget.sensorData.length) {
+      return widget.sensorData[_currentIndex].sensorValues;
+    }
+    return widget.sensorData.last.sensorValues;
   }
 
   @override
   Widget build(BuildContext context) {
-    List<List<double>> currentValues =
-        widget.sensorData[_currentDataIndex].sensorValues;
+    List<List<double>> currentValues = _getCurrentSensorValues();
 
     return Center(
       child: Container(
