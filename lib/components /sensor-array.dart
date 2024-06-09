@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 class TimeStampedSensorValues {
@@ -16,13 +15,13 @@ class SensorArray extends StatefulWidget {
   final int cols;
   final double sensorSize;
   final bool showNumbers;
-  final List<TimeStampedSensorValues> sensorData;
+  final List<List<double>> sensorValues;
 
   const SensorArray({
     Key? key,
     required this.rows,
     required this.cols,
-    required this.sensorData,
+    required this.sensorValues,
     this.sensorSize = 20.0,
     this.showNumbers = false,
   }) : super(key: key);
@@ -32,44 +31,18 @@ class SensorArray extends StatefulWidget {
 }
 
 class _SensorArrayState extends State<SensorArray> {
-  late Timer _timer;
-  int _currentIndex = 0;
-
   @override
   void initState() {
     super.initState();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      if (_currentIndex >= widget.sensorData.length - 1) {
-        _timer.cancel();
-      } else {
-        setState(() {
-          _currentIndex++;
-        });
-      }
-    });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     super.dispose();
-  }
-
-  List<List<double>> _getCurrentSensorValues() {
-    if (_currentIndex < widget.sensorData.length) {
-      return widget.sensorData[_currentIndex].sensorValues;
-    }
-    return widget.sensorData.last.sensorValues;
   }
 
   @override
   Widget build(BuildContext context) {
-    List<List<double>> currentValues = _getCurrentSensorValues();
-
     return Center(
       child: Container(
         decoration: BoxDecoration(
@@ -93,7 +66,7 @@ class _SensorArrayState extends State<SensorArray> {
           itemBuilder: (context, index) {
             int row = index ~/ widget.cols;
             int col = index % widget.cols;
-            double sensorValue = currentValues[row][col];
+            double sensorValue = widget.sensorValues[row][col];
             return Container(
               margin: const EdgeInsets.all(2.0),
               width: widget.sensorSize,

@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
+import 'package:sit_right_app/data_augmentation.service.dart';
+import 'package:sit_right_app/posture.service.dart';
 import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 
@@ -58,11 +60,16 @@ List<TimeStampedSensorValues> generateWavySensorData(
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Map<String, List<List<double>>> data = {
+    "backrest": List.generate(10, (index) => List.filled(10, 0.0)),
+    "seat": List.generate(10, (index) => List.filled(10, 0.0)),
+  };
+
+  PostureService postureService = PostureService();
+  DataAugmentationService dataAugmentationService = DataAugmentationService();
+
   @override
   Widget build(BuildContext context) {
-    List<TimeStampedSensorValues> sensorData =
-        generateWavySensorData(10, 10, 10000, 100);
-
     return Scaffold(
         body: Row(
       children: [
@@ -75,15 +82,27 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 DropdownWidget(
                   list: const [
-                    "Upright",
-                    "Slouching",
-                    "Left Leaning",
-                    "Right Leaning",
-                    "Leaning Back"
+                    "upright",
+                    "slouching",
+                    "leftLeaning",
+                    "rightLeaning",
+                    "leaningBack"
                   ],
                   onValueChanged: (value) {
-                    // ignore: avoid_print
-                    print("Selected value: $value");
+                    setState(() {
+                      var postureData = postureService.get(value);
+
+                      var backrest = dataAugmentationService
+                          .generateAugmentedDataForPosture(
+                              postureData["backrest"]!);
+                      var seat = dataAugmentationService
+                          .generateAugmentedDataForPosture(
+                              postureData["backrest"]!);
+
+                      data = {"backrest": backrest, "seat": seat};
+
+                      // data = postureData;
+                    });
                   },
                 ),
                 Column(
@@ -92,14 +111,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       rows: 10,
                       cols: 10,
                       sensorSize: 25.0,
-                      sensorData: sensorData,
+                      sensorValues: data["backrest"] ?? [],
                     ),
                     const SizedBox(height: 10),
                     SensorArray(
                       rows: 10,
                       cols: 10,
                       sensorSize: 25.0,
-                      sensorData: sensorData,
+                      sensorValues: data["seat"] ?? [],
                     ),
                   ],
                 )
