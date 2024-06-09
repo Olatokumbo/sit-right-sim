@@ -1,10 +1,7 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
-
+import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 
 void main() {
@@ -76,6 +73,19 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                DropdownWidget(
+                  list: const [
+                    "Upright",
+                    "Slouching",
+                    "Left Leaning",
+                    "Right Leaning",
+                    "Leaning Back"
+                  ],
+                  onValueChanged: (value) {
+                    // ignore: avoid_print
+                    print("Selected value: $value");
+                  },
+                ),
                 Column(
                   children: [
                     SensorArray(
