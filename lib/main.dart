@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/posture.service.dart';
@@ -91,7 +92,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onValueChanged: (value) {
                     setState(() {
                       var postureData = postureService.get(value);
-
                       var backrest = dataAugmentationService
                           .generateAugmentedDataForPosture(
                               postureData["backrest"]!);
@@ -100,8 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               postureData["backrest"]!);
 
                       data = {"backrest": backrest, "seat": seat};
-
-                      // data = postureData;
                     });
                   },
                 ),
@@ -127,23 +125,32 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         const Expanded(
-            flex: 3,
-            child: Column(
-              children: [
-                Expanded(
+          flex: 3,
+          child: Column(
+            children: [
+              Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: CardComponent(title: "Sitting Pattern"))
+                    ],
+                  )),
+              Expanded(
+                  child: Row(
+                children: [
+                  Expanded(
                     flex: 1,
-                    child: Column(
-                      children: [Text("k;nokno")],
-                    )),
-                Expanded(
-                    child: Row(
-                  children: [
-                    Expanded(child: PieChartWidget()),
-                    Expanded(child: PieChartWidget())
-                  ],
-                )),
-              ],
-            ))
+                    child: CardComponent(
+                        title: "Statistics", customWidget: PieChartWidget()),
+                  ),
+                  Expanded(flex: 1, child: CardComponent(title: "Stats"))
+                ],
+              )),
+            ],
+          ),
+        ),
       ],
     ));
   }
