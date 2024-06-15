@@ -46,7 +46,7 @@ class _SensorArrayState extends State<SensorArray> {
     return Center(
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF032022),
+          color: const Color.fromARGB(255, 1, 26, 28),
           borderRadius: BorderRadius.circular(20),
         ),
         padding: EdgeInsets.all(widget.sensorSize / 2),

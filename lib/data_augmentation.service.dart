@@ -44,6 +44,38 @@ class DataAugmentationService {
     return shiftedData;
   }
 
+  // Rotate the Data
+  List<List<double>> _rotateData(List<List<double>> data,
+      {double maxAngle = pi / 4}) {
+    var random = Random();
+    double angle = (random.nextDouble() * 2 - 1) *
+        maxAngle; // Random angle between -maxAngle and maxAngle
+
+    int height = data.length;
+    int width = data[0].length;
+    List<List<double>> rotatedData =
+        List.generate(height, (_) => List<double>.filled(width, 0.0));
+
+    int centerX = height ~/ 2;
+    int centerY = width ~/ 2;
+
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        int x = i - centerX;
+        int y = j - centerY;
+
+        int newX = (x * cos(angle) - y * sin(angle)).round() + centerX;
+        int newY = (x * sin(angle) + y * cos(angle)).round() + centerY;
+
+        if (newX >= 0 && newX < height && newY >= 0 && newY < width) {
+          rotatedData[newX][newY] = data[i][j];
+        }
+      }
+    }
+
+    return rotatedData;
+  }
+
   // Adjust Brightness
   List<List<double>> _adjustBrightness(List<List<double>> data,
       {double factor = 1.5}) {
@@ -97,8 +129,9 @@ class DataAugmentationService {
         List<List<double>>.from(data.map((row) => List<double>.from(row)));
 
     if (random.nextBool()) augData = _addNoise(augData);
-    // if (random.nextBool()) augData = _scaleData(augData);
-    if (random.nextBool()) augData = _shiftData(augData);
+    if (random.nextBool()) augData = _scaleData(augData);
+    // if (random.nextBool()) augData = _shiftData(augData); //Removed for now 
+    if (random.nextBool()) augData = _rotateData(augData);
     if (random.nextBool()) augData = _applyGaussianBlur(augData);
     if (random.nextBool()) augData = _randomErasing(augData);
     if (random.nextBool()) augData = _adjustBrightness(augData);

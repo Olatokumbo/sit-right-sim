@@ -23,9 +23,9 @@ class PosturePredictionService {
           case 3:
             return "Slouching";
           case 1:
-            return "Left Leaning";
+            return "Leaning Left";
           case 2:
-            return "Right Leaning";
+            return "Leaning Right";
           case 0:
             return "Leaning Back";
           default:

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class DropdownWidget extends StatefulWidget {
-  final List<String> list;
+  final Map<String, String> items;
   final ValueChanged<String> onValueChanged;
 
-  const DropdownWidget(
-      {required this.list, required this.onValueChanged, super.key});
+  const DropdownWidget({
+    required this.items,
+    required this.onValueChanged,
+    super.key,
+  });
 
   @override
   State<DropdownWidget> createState() => _DropdownWidgetState();
@@ -17,7 +20,7 @@ class _DropdownWidgetState extends State<DropdownWidget> {
   @override
   void initState() {
     super.initState();
-    dropdownValue = widget.list.first;
+    dropdownValue = widget.items.values.first;
   }
 
   @override
@@ -30,10 +33,10 @@ class _DropdownWidgetState extends State<DropdownWidget> {
           widget.onValueChanged(dropdownValue);
         });
       },
-      items: widget.list.map<DropdownMenuItem<String>>((String value) {
+      items: widget.items.entries.map<DropdownMenuItem<String>>((entry) {
         return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
+          value: entry.value,
+          child: Text(entry.key),
         );
       }).toList(),
     );

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
+import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/posture.service.dart';
 import 'package:sit_right_app/posture_prediction.service.dart';
@@ -66,12 +68,41 @@ class _MyHomePageState extends State<MyHomePage> {
     "backrest": List.generate(10, (index) => List.filled(10, 0.0)),
     "seat": List.generate(10, (index) => List.filled(10, 0.0)),
   };
-  String posture = "Unknown";
+  String predictedPosture = "No Posture Detected";
+  String simulatedPosture = 'upright';
 
   PostureService postureService = PostureService();
   DataAugmentationService dataAugmentationService = DataAugmentationService();
   PosturePredictionService posturePredictionService =
       PosturePredictionService();
+
+  Future<void> setPosture(value) async {
+    if (value == null) {
+      return;
+    }
+    setState(() {
+      var postureData = postureService.get(value);
+      var backrest = dataAugmentationService
+          .generateAugmentedDataForPosture(postureData["backrest"]!);
+      var seat = dataAugmentationService
+          .generateAugmentedDataForPosture(postureData["seat"]!);
+
+      data = {"backrest": backrest, "seat": seat};
+    });
+
+    List<double> flattenedList = [
+      ...data["backrest"]?.expand((innerList) => innerList) ?? [],
+      ...data["seat"]?.expand((innerList) => innerList) ?? [],
+    ];
+
+    var response =
+        await posturePredictionService.fetchPrediction(flattenedList);
+
+    setState(() {
+      predictedPosture = response;
+      simulatedPosture = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,48 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   CardComponent(
+                    title: "Sensor Array",
                     flex: 3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        DropdownWidget(
-                          list: const [
-                            "upright",
-                            "slouching",
-                            "leftLeaning",
-                            "rightLeaning",
-                            "leaningBack"
-                          ],
-                          onValueChanged: (value) async {
-                            setState(() {
-                              var postureData = postureService.get(value);
-                              var backrest = dataAugmentationService
-                                  .generateAugmentedDataForPosture(
-                                      postureData["backrest"]!);
-                              var seat = dataAugmentationService
-                                  .generateAugmentedDataForPosture(
-                                      postureData["seat"]!);
-
-                              data = {"backrest": backrest, "seat": seat};
-                            });
-
-                            List<double> flattenedList = [
-                              ...data["backrest"]
-                                      ?.expand((innerList) => innerList) ??
-                                  [],
-                              ...data["seat"]
-                                      ?.expand((innerList) => innerList) ??
-                                  [],
-                            ];
-
-                            var response = await posturePredictionService
-                                .fetchPrediction(flattenedList);
-
-                            setState(() {
-                              posture = response;
-                            });
-                          },
-                        ),
                         Column(
                           children: [
                             SensorArray(
@@ -152,9 +146,42 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
-                  const CardComponent(
-                    title: "Controls",
-                    // child: Text("Hello World"),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        CardComponent(
+                          title: "Simulated Posture",
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              DropdownWidget(
+                                items: const {
+                                  "Upright": "upright",
+                                  "Slouching": "slouching",
+                                  "Leaning Left": "leftLeaning",
+                                  "Leaning Right": "rightLeaning",
+                                  "Leaning Back": "leaningBack"
+                                },
+                                onValueChanged: (value) async {
+                                  setPosture(value);
+                                },
+                              ),
+                              IconButton(
+                                  onPressed: () async {
+                                    // if (posture != ) {
+                                    await setPosture(simulatedPosture);
+                                    // }
+                                  },
+                                  icon: const Icon(Icons.refresh))
+                            ],
+                          ),
+                        ),
+                        const CardComponent(
+                          title: "Timer",
+                          child: TimerComponent(),
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -177,9 +204,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         CardComponent(
                           title: "Realtime Posture",
                           child: Text(
-                            posture,
+                            predictedPosture,
                             style: const TextStyle(
-                                fontSize: 50, fontWeight: FontWeight.w800),
+                                fontSize: 30, fontWeight: FontWeight.w800),
                           ),
                         )
                       ],
