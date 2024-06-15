@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
+import 'package:sit_right_app/components%20/statistic_charts.dart';
 import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
+import 'package:sit_right_app/models/postureStats.dart';
 import 'package:sit_right_app/posture.service.dart';
 import 'package:sit_right_app/posture_prediction.service.dart';
 import "components /dropdown_widget.dart";
@@ -75,6 +78,29 @@ class _MyHomePageState extends State<MyHomePage> {
   DataAugmentationService dataAugmentationService = DataAugmentationService();
   PosturePredictionService posturePredictionService =
       PosturePredictionService();
+  var startTime = DateTime.now();
+
+  List<PostureStatistics> postureStatistics = [];
+
+  void updateStatistics(String posture, Duration duration) {
+    setState(() {
+      // Find the index of the existing stat
+      int index =
+          postureStatistics.indexWhere((stat) => stat.posture == posture);
+
+      if (index == -1) {
+        // If not found, add new entry
+        postureStatistics.add(PostureStatistics(posture, duration));
+      } else {
+        // If found, update the existing duration by creating a new instance
+        PostureStatistics existingStat = postureStatistics[index];
+        PostureStatistics updatedStat = existingStat.copyWith(
+          duration: existingStat.duration + duration,
+        );
+        postureStatistics[index] = updatedStat;
+      }
+    });
+  }
 
   Future<void> setPosture(value) async {
     if (value == null) {
@@ -95,13 +121,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ...data["seat"]?.expand((innerList) => innerList) ?? [],
     ];
 
-    var response =
-        await posturePredictionService.fetchPrediction(flattenedList);
+    var posture = await posturePredictionService.fetchPrediction(flattenedList);
+
+    var duration = DateTime.now().difference(startTime);
 
     setState(() {
-      predictedPosture = response;
+      predictedPosture = posture;
       simulatedPosture = value;
+      startTime = DateTime.now();
+      updateStatistics(posture, duration);
     });
+
+    print(posture);
+    print(duration);
   }
 
   @override
@@ -199,8 +231,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   Expanded(
                     child: Row(
                       children: [
-                        const CardComponent(
-                            title: "Statistics", child: PieChartWidget()),
+                        CardComponent(
+                          title: "Statistics",
+                          child: StatisticsPieChart(postureStatistics),
+                        ),
                         CardComponent(
                           title: "Realtime Posture",
                           child: Text(
