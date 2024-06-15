@@ -76,107 +76,119 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DropdownWidget(
-                  list: const [
-                    "upright",
-                    "slouching",
-                    "leftLeaning",
-                    "rightLeaning",
-                    "leaningBack"
-                  ],
-                  onValueChanged: (value) async {
-                    setState(() {
-                      var postureData = postureService.get(value);
-                      var backrest = dataAugmentationService
-                          .generateAugmentedDataForPosture(
-                              postureData["backrest"]!);
-                      var seat = dataAugmentationService
-                          .generateAugmentedDataForPosture(
-                              postureData["seat"]!);
-
-                      data = {"backrest": backrest, "seat": seat};
-                    });
-
-                    List<double> flattenedList = [
-                      ...data["backrest"]?.expand((innerList) => innerList) ??
-                          [],
-                      ...data["seat"]?.expand((innerList) => innerList) ?? [],
-                    ];
-
-                    var response = await posturePredictionService
-                        .fetchPrediction(flattenedList);
-
-                    setState(() {
-                      posture = response;
-                    });
-                  },
-                ),
-                Column(
-                  children: [
-                    SensorArray(
-                      rows: 10,
-                      cols: 10,
-                      sensorSize: 25.0,
-                      sensorValues: data["backrest"] ?? [],
-                    ),
-                    const SizedBox(height: 10),
-                    SensorArray(
-                      rows: 10,
-                      cols: 10,
-                      sensorSize: 25.0,
-                      sensorValues: data["seat"] ?? [],
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
+        appBar: AppBar(
+          centerTitle: false,
+          backgroundColor: const Color(0xFF032022),
+          title: const Text('SitRight Dashboard'),
+          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
         ),
-        Expanded(
-          flex: 3,
-          child: Column(
-            children: [
-              const Expanded(
-                  flex: 1,
-                  child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: CardComponent(title: "Sitting Pattern"))
-                    ],
-                  )),
-              Expanded(
-                  child: Row(
+        body: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CardComponent(
+                    flex: 3,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        DropdownWidget(
+                          list: const [
+                            "upright",
+                            "slouching",
+                            "leftLeaning",
+                            "rightLeaning",
+                            "leaningBack"
+                          ],
+                          onValueChanged: (value) async {
+                            setState(() {
+                              var postureData = postureService.get(value);
+                              var backrest = dataAugmentationService
+                                  .generateAugmentedDataForPosture(
+                                      postureData["backrest"]!);
+                              var seat = dataAugmentationService
+                                  .generateAugmentedDataForPosture(
+                                      postureData["seat"]!);
+
+                              data = {"backrest": backrest, "seat": seat};
+                            });
+
+                            List<double> flattenedList = [
+                              ...data["backrest"]
+                                      ?.expand((innerList) => innerList) ??
+                                  [],
+                              ...data["seat"]
+                                      ?.expand((innerList) => innerList) ??
+                                  [],
+                            ];
+
+                            var response = await posturePredictionService
+                                .fetchPrediction(flattenedList);
+
+                            setState(() {
+                              posture = response;
+                            });
+                          },
+                        ),
+                        Column(
+                          children: [
+                            SensorArray(
+                              rows: 10,
+                              cols: 10,
+                              sensorSize: 25.0,
+                              sensorValues: data["backrest"] ?? [],
+                            ),
+                            const SizedBox(height: 10),
+                            SensorArray(
+                              rows: 10,
+                              cols: 10,
+                              sensorSize: 25.0,
+                              sensorValues: data["seat"] ?? [],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  const CardComponent(
+                    title: "Controls",
+                    // child: Text("Hello World"),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Column(
                 children: [
                   const Expanded(
                     flex: 1,
-                    child: CardComponent(
-                        title: "Statistics", customWidget: PieChartWidget()),
+                    child: Row(
+                      children: [CardComponent(title: "Sitting Pattern")],
+                    ),
                   ),
                   Expanded(
-                    flex: 1,
-                    child: CardComponent(
-                      title: "Realtime Posture",
-                      customWidget: Text(posture,
-                          style: const TextStyle(
-                              fontSize: 50, fontWeight: FontWeight.w800)),
+                    child: Row(
+                      children: [
+                        const CardComponent(
+                            title: "Statistics", child: PieChartWidget()),
+                        CardComponent(
+                          title: "Realtime Posture",
+                          child: Text(
+                            posture,
+                            style: const TextStyle(
+                                fontSize: 50, fontWeight: FontWeight.w800),
+                          ),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
-              )),
-            ],
-          ),
-        ),
-      ],
-    ));
+              ),
+            ),
+          ],
+        ));
   }
 }
