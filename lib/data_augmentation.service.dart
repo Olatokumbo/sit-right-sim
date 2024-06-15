@@ -97,7 +97,7 @@ class DataAugmentationService {
         List<List<double>>.from(data.map((row) => List<double>.from(row)));
 
     if (random.nextBool()) augData = _addNoise(augData);
-    if (random.nextBool()) augData = _scaleData(augData);
+    // if (random.nextBool()) augData = _scaleData(augData);
     if (random.nextBool()) augData = _shiftData(augData);
     if (random.nextBool()) augData = _applyGaussianBlur(augData);
     if (random.nextBool()) augData = _randomErasing(augData);

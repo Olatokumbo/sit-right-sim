@@ -4,6 +4,7 @@ import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/posture.service.dart';
+import 'package:sit_right_app/posture_prediction.service.dart';
 import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 
@@ -65,9 +66,12 @@ class _MyHomePageState extends State<MyHomePage> {
     "backrest": List.generate(10, (index) => List.filled(10, 0.0)),
     "seat": List.generate(10, (index) => List.filled(10, 0.0)),
   };
+  String posture = "Unknown";
 
   PostureService postureService = PostureService();
   DataAugmentationService dataAugmentationService = DataAugmentationService();
+  PosturePredictionService posturePredictionService =
+      PosturePredictionService();
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     "rightLeaning",
                     "leaningBack"
                   ],
-                  onValueChanged: (value) {
+                  onValueChanged: (value) async {
                     setState(() {
                       var postureData = postureService.get(value);
                       var backrest = dataAugmentationService
@@ -97,9 +101,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               postureData["backrest"]!);
                       var seat = dataAugmentationService
                           .generateAugmentedDataForPosture(
-                              postureData["backrest"]!);
+                              postureData["seat"]!);
 
                       data = {"backrest": backrest, "seat": seat};
+                    });
+
+                    List<double> flattenedList = [
+                      ...data["backrest"]?.expand((innerList) => innerList) ??
+                          [],
+                      ...data["seat"]?.expand((innerList) => innerList) ?? [],
+                    ];
+
+                    var response = await posturePredictionService
+                        .fetchPrediction(flattenedList);
+
+                    setState(() {
+                      posture = response;
                     });
                   },
                 ),
@@ -124,11 +141,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        const Expanded(
+        Expanded(
           flex: 3,
           child: Column(
             children: [
-              Expanded(
+              const Expanded(
                   flex: 1,
                   child: Row(
                     children: [
@@ -140,12 +157,20 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                   child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     flex: 1,
                     child: CardComponent(
                         title: "Statistics", customWidget: PieChartWidget()),
                   ),
-                  Expanded(flex: 1, child: CardComponent(title: "Stats"))
+                  Expanded(
+                    flex: 1,
+                    child: CardComponent(
+                      title: "Realtime Posture",
+                      customWidget: Text(posture,
+                          style: const TextStyle(
+                              fontSize: 50, fontWeight: FontWeight.w800)),
+                    ),
+                  )
                 ],
               )),
             ],
