@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
+import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/models/postureStats.dart';
@@ -135,6 +137,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    setPosture(simulatedPosture);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -235,11 +243,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         CardComponent(
                           title: "Realtime Posture",
-                          child: Text(
-                            predictedPosture,
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.w800),
-                          ),
+                          child:
+                              PostureWidget(predictedPosture: predictedPosture),
                         )
                       ],
                     ),
