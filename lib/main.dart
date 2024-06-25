@@ -126,14 +126,11 @@ class _MyHomePageState extends State<MyHomePage> {
     var duration = DateTime.now().difference(startTime);
 
     setState(() {
+      startTime = DateTime.now();
+      updateStatistics(predictedPosture, duration);
       predictedPosture = posture;
       simulatedPosture = value;
-      startTime = DateTime.now();
-      updateStatistics(posture, duration);
     });
-
-    print(posture);
-    print(duration);
   }
 
   @override
@@ -239,10 +236,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         CardComponent(
                           title: "Statistics",
-                          child: StatisticsPieChart(postureStatistics),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              StatisticsPieChart(postureStatistics),
+                            ],
+                          ),
                         ),
                         CardComponent(
-                          title: "Realtime Posture",
+                          title: "Predicted Posture",
                           child:
                               PostureWidget(predictedPosture: predictedPosture),
                         )
