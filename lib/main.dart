@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
-import 'package:sit_right_app/components%20/statistic_charts.dart';
 import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/models/postureStats.dart';
