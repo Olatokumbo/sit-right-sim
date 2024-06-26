@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
@@ -225,10 +225,15 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 3,
               child: Column(
                 children: [
-                  const Expanded(
+                  Expanded(
                     flex: 1,
                     child: Row(
-                      children: [CardComponent(title: "Sitting Pattern")],
+                      children: [
+                        CardComponent(
+                          title: "Sitting Pattern",
+                          child: BarChartWidget(postureStatistics),
+                        )
+                      ],
                     ),
                   ),
                   Expanded(

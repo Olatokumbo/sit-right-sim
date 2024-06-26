@@ -30,7 +30,7 @@ class CardComponent extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.black87,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

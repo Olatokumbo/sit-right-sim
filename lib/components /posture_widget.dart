@@ -39,7 +39,7 @@ class PostureWidget extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: SvgPicture.asset(
             "./assets/${findPosture(predictedPosture)}.svg",
-            height: 150,
+            height: 170,
             color: Colors.amber,
           ),
         )
