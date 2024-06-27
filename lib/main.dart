@@ -8,12 +8,15 @@ import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/data_augmentation.service.dart';
 import 'package:sit_right_app/models/postureStats.dart';
+import 'package:sit_right_app/openai.dart';
 import 'package:sit_right_app/posture.service.dart';
 import 'package:sit_right_app/posture_prediction.service.dart';
 import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -73,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   };
   String predictedPosture = "No Posture Detected";
   String simulatedPosture = 'upright';
+  String aiRecommendation = "";
 
   PostureService postureService = PostureService();
   DataAugmentationService dataAugmentationService = DataAugmentationService();
@@ -125,11 +129,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var duration = DateTime.now().difference(startTime);
 
+    var recommendation = await getRecommendations(postureStatistics);
+
     setState(() {
       startTime = DateTime.now();
       updateStatistics(predictedPosture, duration);
       predictedPosture = posture;
       simulatedPosture = value;
+      aiRecommendation = recommendation;
     });
   }
 
@@ -252,7 +259,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: "Predicted Posture",
                           child:
                               PostureWidget(predictedPosture: predictedPosture),
-                        )
+                        ),
+                        CardComponent(
+                            title: "AI Recommendation",
+                            child: Text(aiRecommendation))
                       ],
                     ),
                   ),
