@@ -151,14 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             SensorArray(
                               rows: sensorSize,
                               cols: sensorSize,
-                              sensorSize: 190 / sensorSize,
+                              sensorSize: 180 / sensorSize,
                               sensorValues: data["backrest"] ?? [],
                             ),
                             const SizedBox(height: 10),
                             SensorArray(
                               rows: sensorSize,
                               cols: sensorSize,
-                              sensorSize: 190 / sensorSize,
+                              sensorSize: 180 / sensorSize,
                               sensorValues: data["seat"] ?? [],
                             ),
                             DropdownWidget(
