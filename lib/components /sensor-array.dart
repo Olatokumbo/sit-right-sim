@@ -67,6 +67,7 @@ class _SensorArrayState extends State<SensorArray> {
             int row = index ~/ widget.cols;
             int col = index % widget.cols;
             double sensorValue = widget.sensorValues[row][col];
+            sensorValue = sensorValue > 1.0 ? 1.0 : sensorValue;
             return Container(
               margin: const EdgeInsets.all(2.0),
               width: widget.sensorSize,

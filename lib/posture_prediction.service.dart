@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PosturePredictionService {
-  final String url = "https://predict-qtrb3tnorq-uc.a.run.app";
+  final String url = "https://main-qtrb3tnorq-uc.a.run.app";
 
   Future<String> fetchPrediction(List<double> value) async {
     try {

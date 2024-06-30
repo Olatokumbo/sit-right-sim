@@ -24,8 +24,8 @@ class DataAugmentationService {
     }).toList();
   }
 
-  // Shift the Data
-  List<List<double>> _shiftData(List<List<double>> data, {int shiftMax = 1}) {
+  // Shift the Data (Not in use)
+  List<List<double>> _shiftData(List<List<double>> data, {int shiftMax = 0}) {
     var random = Random();
     int shiftX = random.nextInt(shiftMax * 2 + 1) - shiftMax;
     int shiftY = random.nextInt(shiftMax * 2 + 1) - shiftMax;
@@ -46,7 +46,7 @@ class DataAugmentationService {
 
   // Rotate the Data
   List<List<double>> _rotateData(List<List<double>> data,
-      {double maxAngle = pi / 4}) {
+      {double maxAngle = pi / 8}) {
     var random = Random();
     double angle = (random.nextDouble() * 2 - 1) *
         maxAngle; // Random angle between -maxAngle and maxAngle
@@ -130,7 +130,7 @@ class DataAugmentationService {
 
     if (random.nextBool()) augData = _addNoise(augData);
     if (random.nextBool()) augData = _scaleData(augData);
-    // if (random.nextBool()) augData = _shiftData(augData); //Removed for now 
+    if (random.nextBool()) augData = _shiftData(augData); //Removed for now 
     if (random.nextBool()) augData = _rotateData(augData);
     if (random.nextBool()) augData = _applyGaussianBlur(augData);
     if (random.nextBool()) augData = _randomErasing(augData);
