@@ -46,8 +46,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Map<String, List<List<double>>> data = {
-    "backrest": List.generate(10, (index) => List.filled(10, 0.0)),
-    "seat": List.generate(10, (index) => List.filled(10, 0.0)),
+    "backrest": List.generate(5, (index) => List.filled(5, 0.0)),
+    "seat": List.generate(5, (index) => List.filled(5, 0.0)),
   };
   String predictedPosture = "No Posture Detected";
   String simulatedPosture = 'upright';
@@ -58,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
   PosturePredictionService posturePredictionService =
       PosturePredictionService();
   var startTime = DateTime.now();
-
   List<PostureStatistics> postureStatistics = [];
+  var sensorSize = 5;
 
   void updateStatistics(String posture, Duration duration) {
     setState(() {
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      var postureData = postureService.get(value, 10);
+      var postureData = postureService.get(value, sensorSize);
       var backrest = dataAugmentationService
           .generateAugmentedDataForPosture(postureData["backrest"]!);
       var seat = dataAugmentationService
@@ -147,17 +147,33 @@ class _MyHomePageState extends State<MyHomePage> {
                         Column(
                           children: [
                             SensorArray(
-                              rows: 10,
-                              cols: 10,
-                              sensorSize: 25.0,
+                              rows: sensorSize,
+                              cols: sensorSize,
+                              sensorSize: 190 / sensorSize,
                               sensorValues: data["backrest"] ?? [],
                             ),
                             const SizedBox(height: 10),
                             SensorArray(
-                              rows: 10,
-                              cols: 10,
-                              sensorSize: 25.0,
+                              rows: sensorSize,
+                              cols: sensorSize,
+                              sensorSize: 190 / sensorSize,
                               sensorValues: data["seat"] ?? [],
+                            ),
+                            DropdownWidget(
+                              items: const {
+                                "5x5": "5",
+                                "10x10": "10",
+                                "15x15": "15",
+                                "20x20": "20",
+                                "25x25": "25",
+                                "32x32": "32"
+                              },
+                              onValueChanged: (value) async {
+                                setState(() {
+                                  sensorSize = int.parse(value);
+                                });
+                                await setPosture(simulatedPosture);
+                              },
                             ),
                           ],
                         )
@@ -186,9 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               IconButton(
                                   onPressed: () async {
-                                    // if (posture != ) {
                                     await setPosture(simulatedPosture);
-                                    // }
                                   },
                                   icon: const Icon(Icons.refresh))
                             ],
