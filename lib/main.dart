@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var startTime = DateTime.now();
   List<PostureStatistics> postureStatistics = [];
   var sensorSize = 5;
+  bool loading = false;
 
   void updateStatistics(String posture, Duration duration) {
     setState(() {
@@ -94,13 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
           .generateAugmentedDataForPosture(postureData["seat"]!);
 
       data = {"backrest": backrest, "seat": seat};
+      loading = true;
     });
 
     List<double> flattenedList = [
       ...data["backrest"]?.expand((innerList) => innerList) ?? [],
       ...data["seat"]?.expand((innerList) => innerList) ?? [],
     ];
-
     var posture = await posturePredictionService.fetchPrediction(flattenedList);
 
     var duration = DateTime.now().difference(startTime);
@@ -113,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
       predictedPosture = posture;
       simulatedPosture = value;
       aiRecommendation = recommendation;
+      loading = false;
     });
   }
 
@@ -247,8 +249,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         CardComponent(
                           title: "Predicted Posture",
-                          child:
-                              PostureWidget(predictedPosture: predictedPosture),
+                          child: loading
+                              ? const Text("Loading...")
+                              : PostureWidget(
+                                  predictedPosture: predictedPosture),
                         ),
                         CardComponent(
                             title: "AI Recommendation",
