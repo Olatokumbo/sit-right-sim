@@ -56,7 +56,8 @@ Future<String> getRecommendations(List<PostureStatistics> postures) async {
     return recommendationCounter.lastRecommendation;
   }
 
-  final apiKey = dotenv.env["OPENAI_API_KEY"];
+  // final apiKey = dotenv.env["OPENAI_API_KEY"];
+  const apiKey = "sk-proj-jp29NPq4niLh0fjS9Yu3T3BlbkFJzRr6AajGQ3dIs5uoDJqo";
   const url =
       'https://api.openai.com/v1/completions'; // example endpoint, adjust as needed
 
