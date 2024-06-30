@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
@@ -86,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (value == null) {
       return;
     }
+
     setState(() {
       var postureData = postureService.get(value, 10);
       var backrest = dataAugmentationService
