@@ -23,7 +23,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,29 +43,6 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
-}
-
-List<TimeStampedSensorValues> generateWavySensorData(
-    int rows, int cols, int totalDurationMillis, int intervalMillis) {
-  int numDataPoints = totalDurationMillis ~/ intervalMillis;
-  List<TimeStampedSensorValues> sensorData = [];
-  DateTime startTime = DateTime.now();
-
-  for (int k = 0; k < numDataPoints; k++) {
-    DateTime timestamp =
-        startTime.add(Duration(milliseconds: k * intervalMillis));
-    List<List<double>> sensorValues = List.generate(
-      rows,
-      (i) => List.generate(
-        cols,
-        (j) => (0.5 + 0.5 * sin(2 * pi * (i + j + k) / 10)), // Wavy pattern
-      ),
-    );
-    sensorData.add(TimeStampedSensorValues(
-        timestamp: timestamp, sensorValues: sensorValues));
-  }
-
-  return sensorData;
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -111,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     setState(() {
-      var postureData = postureService.get(value);
+      var postureData = postureService.get(value, 10);
       var backrest = dataAugmentationService
           .generateAugmentedDataForPosture(postureData["backrest"]!);
       var seat = dataAugmentationService

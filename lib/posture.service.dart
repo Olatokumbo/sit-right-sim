@@ -132,7 +132,64 @@ class PostureService {
     }
   };
 
-  Map<String, List<List<double>>> get(String posture) {
-    return postures[posture] ?? {};
+  // Method to get posture data scaled to gridSize
+  Map<String, List<List<double>>> get(String posture, int gridSize) {
+    if (postures.containsKey(posture)) {
+      return scalePosture(postures[posture]!, gridSize);
+    }
+    return {"backrest": [], "seat": []};
+  }
+
+  Map<String, List<List<double>>> scalePosture(
+      Map<String, List<List<double>>> postureData, int desiredGridSize) {
+    Map<String, List<List<double>>> scaledPosture = {};
+
+    for (String component in postureData.keys) {
+      List<List<double>> componentGrid = postureData[component]!;
+      int originalGridSize = componentGrid.length;
+
+      // Calculate scaling factors
+      double scaleX = originalGridSize / desiredGridSize;
+      double scaleY = originalGridSize / desiredGridSize;
+
+      // Initialize scaled component grid with desiredGridSize length
+      List<List<double>> scaledComponentGrid = List.generate(
+          desiredGridSize, (index) => List.filled(desiredGridSize, 0.0));
+
+      // Perform bilinear interpolation
+      for (int y = 0; y < desiredGridSize; y++) {
+        for (int x = 0; x < desiredGridSize; x++) {
+          double originX = x * scaleX;
+          double originY = y * scaleY;
+
+          int x1 = originX.floor().clamp(0, originalGridSize - 1);
+          int x2 = (originX.ceil()).clamp(0, originalGridSize - 1);
+          int y1 = originY.floor().clamp(0, originalGridSize - 1);
+          int y2 = (originY.ceil()).clamp(0, originalGridSize - 1);
+
+          double value = bilinearInterpolation(
+              componentGrid[y1][x1],
+              componentGrid[y1][x2],
+              componentGrid[y2][x1],
+              componentGrid[y2][x2],
+              originX - x1,
+              originY - y1);
+
+          scaledComponentGrid[y][x] = value;
+        }
+      }
+
+      scaledPosture[component] = scaledComponentGrid;
+    }
+
+    return scaledPosture;
+  }
+
+// Bilinear interpolation function
+  double bilinearInterpolation(double q11, double q12, double q21, double q22,
+      double xFraction, double yFraction) {
+    double topRow = q11 * (1 - xFraction) + q21 * xFraction;
+    double bottomRow = q12 * (1 - xFraction) + q22 * xFraction;
+    return topRow * (1 - yFraction) + bottomRow * yFraction;
   }
 }
