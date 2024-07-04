@@ -18,13 +18,13 @@ class SensorArray extends StatefulWidget {
   final List<List<double>> sensorValues;
 
   const SensorArray({
-    Key? key,
+    super.key,
     required this.rows,
     required this.cols,
     required this.sensorValues,
     this.sensorSize = 20.0,
     this.showNumbers = false,
-  }) : super(key: key);
+  });
 
   @override
   _SensorArrayState createState() => _SensorArrayState();
