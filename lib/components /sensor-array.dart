@@ -41,6 +41,17 @@ class _SensorArrayState extends State<SensorArray> {
     super.dispose();
   }
 
+  Color _getColorFromValue(double value) {
+    value = value.clamp(0.0, 1.0); // Ensure value is between 0 and 1
+    if (value < 0.5) {
+      // Interpolate between blue and yellow
+      return Color.lerp(Colors.blue, Colors.yellow, value * 2)!;
+    } else {
+      // Interpolate between yellow and red
+      return Color.lerp(Colors.yellow, Colors.red, (value - 0.5) * 2)!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -49,7 +60,7 @@ class _SensorArrayState extends State<SensorArray> {
           color: const Color.fromARGB(255, 1, 26, 28),
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: EdgeInsets.all(widget.sensorSize / 2),
+        padding: EdgeInsets.all(widget.sensorSize / 1.5 ),
         constraints: BoxConstraints(
           maxWidth: widget.cols * widget.sensorSize +
               (widget.cols - 1) * 2, // 2 is the margin
@@ -69,12 +80,12 @@ class _SensorArrayState extends State<SensorArray> {
             double sensorValue = widget.sensorValues[row][col];
             sensorValue = sensorValue > 1.0 ? 1.0 : sensorValue;
             return Container(
-              margin: const EdgeInsets.all(2.0),
+              margin: const EdgeInsets.all(1.0),
               width: widget.sensorSize,
               height: widget.sensorSize,
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(
-                    sensorValue), // Adjust opacity based on sensor value
+                color: _getColorFromValue(
+                    sensorValue), // Use color based on sensor value
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(2),
               ),

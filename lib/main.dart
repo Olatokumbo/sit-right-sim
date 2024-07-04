@@ -110,7 +110,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       startTime = DateTime.now();
-      updateStatistics(predictedPosture, duration);
+      if (predictedPosture != "No Posture Detected") {
+        updateStatistics(predictedPosture, duration);
+      }
       predictedPosture = posture;
       simulatedPosture = value;
       aiRecommendation = recommendation;
@@ -151,14 +153,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             SensorArray(
                               rows: sensorSize,
                               cols: sensorSize,
-                              sensorSize: 180 / sensorSize,
+                              sensorSize: 190 / sensorSize,
                               sensorValues: data["backrest"] ?? [],
                             ),
                             const SizedBox(height: 10),
                             SensorArray(
                               rows: sensorSize,
                               cols: sensorSize,
-                              sensorSize: 180 / sensorSize,
+                              sensorSize: 190 / sensorSize,
                               sensorValues: data["seat"] ?? [],
                             ),
                             DropdownWidget(
