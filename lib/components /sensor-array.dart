@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'color_scale_bar.dart';
-
-class TimeStampedSensorValues {
-  final DateTime timestamp;
-  final List<List<double>> sensorValues;
-
-  TimeStampedSensorValues({
-    required this.timestamp,
-    required this.sensorValues,
-  });
-}
 
 class SensorArray extends StatefulWidget {
   final int rows;

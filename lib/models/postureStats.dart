@@ -1,13 +1,7 @@
 class PostureStatistics {
   final String posture;
-  final Duration duration;
+  final DateTime startTime;
+  final DateTime endTime;
 
-  PostureStatistics(this.posture, this.duration);
-
-  PostureStatistics copyWith({String? posture, Duration? duration}) {
-    return PostureStatistics(
-      posture ?? this.posture,
-      duration ?? this.duration,
-    );
-  }
+  PostureStatistics(this.posture, this.startTime, this.endTime);
 }

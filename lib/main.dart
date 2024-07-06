@@ -62,31 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var sensorSize = 5;
   bool loading = false;
 
-  void updateStatistics(String posture, Duration duration) {
-    setState(() {
-      // Find the index of the existing stat
-      int index =
-          postureStatistics.indexWhere((stat) => stat.posture == posture);
-
-      if (index == -1) {
-        // If not found, add new entry
-        postureStatistics.add(PostureStatistics(posture, duration));
-      } else {
-        // If found, update the existing duration by creating a new instance
-        PostureStatistics existingStat = postureStatistics[index];
-        PostureStatistics updatedStat = existingStat.copyWith(
-          duration: existingStat.duration + duration,
-        );
-        postureStatistics[index] = updatedStat;
-      }
-    });
-  }
-
-  Future<void> setPosture(value) async {
-    if (value == null) {
-      return;
-    }
-
+  Future<void> setPosture(String value) async {
     setState(() {
       var postureData = postureService.get(value, sensorSize);
       var backrest = dataAugmentationService
@@ -104,15 +80,14 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     var posture = await posturePredictionService.fetchPrediction(flattenedList);
 
-    var duration = DateTime.now().difference(startTime);
-
     var recommendation = await getRecommendations(postureStatistics);
 
     setState(() {
-      startTime = DateTime.now();
       if (predictedPosture != "No Posture Detected") {
-        updateStatistics(predictedPosture, duration);
+        postureStatistics.add(
+            PostureStatistics(predictedPosture, startTime, DateTime.now()));
       }
+      startTime = DateTime.now();
       predictedPosture = posture;
       simulatedPosture = value;
       aiRecommendation = recommendation;
@@ -200,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   "Leaning Right": "rightLeaning",
                                   "Leaning Back": "leaningBack"
                                 },
-                                onValueChanged: (value) async {
+                                onValueChanged: (String value) async {
                                   setPosture(value);
                                 },
                               ),

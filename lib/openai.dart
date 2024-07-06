@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sit_right_app/models/postureStats.dart';
 import 'package:http/http.dart' as http;
+import 'package:sit_right_app/utils.dart';
 
 class RecommendationCounter {
   static final RecommendationCounter _instance =
@@ -30,12 +31,13 @@ class RecommendationCounter {
 
 String generatePrompt(List<PostureStatistics> postures) {
   final buffer = StringBuffer();
+
+  var formattedPostures = groupPosture(postures);
   buffer.writeln(
       'I have been sitting in the following postures for these durations:');
 
-  for (var posture in postures) {
-    buffer.writeln(
-        '${posture.posture} for ${posture.duration.inMinutes} minutes');
+  for (var posture in formattedPostures) {
+    buffer.writeln('${posture.posture} for ${posture.duration} seconds');
   }
 
   buffer.writeln(

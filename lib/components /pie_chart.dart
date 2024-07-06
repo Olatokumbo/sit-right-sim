@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sit_right_app/models/postureStats.dart';
+import 'package:sit_right_app/utils.dart';
 
 class StatisticsPieChart extends StatelessWidget {
   final List<PostureStatistics> data;
@@ -16,11 +17,10 @@ class StatisticsPieChart extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: PieChart(
             PieChartData(
-              sections: data.map((postureStats) {
+              sections: groupPosture(data).map((postureStats) {
                 return PieChartSectionData(
-                  color: Colors.primaries[
-                      data.indexOf(postureStats) % Colors.primaries.length],
-                  value: postureStats.duration.inSeconds.toDouble(),
+                  color: getColorByPosture(postureStats.posture),
+                  value: postureStats.duration.toDouble(),
                   title: postureStats.posture,
                   radius: 100,
                   titleStyle: const TextStyle(
