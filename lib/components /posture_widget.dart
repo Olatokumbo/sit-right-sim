@@ -20,7 +20,7 @@ class PostureWidget extends StatelessWidget {
       case "Leaning Right":
         return "rightLeaning";
       case "Leaning Back":
-        return "leaningBack";
+        return "backLeaning";
       default:
         return "empty";
     }

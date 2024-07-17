@@ -173,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   "Slouching": "slouching",
                                   "Leaning Left": "leftLeaning",
                                   "Leaning Right": "rightLeaning",
-                                  "Leaning Back": "leaningBack"
+                                  "Leaning Back": "backLeaning"
                                 },
                                 onValueChanged: (String value) async {
                                   setPosture(value);

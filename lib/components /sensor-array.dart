@@ -33,13 +33,19 @@ class _SensorArrayState extends State<SensorArray> {
   }
 
   Color _getColorFromValue(double value) {
-    value = value.clamp(0.0, 1.0); // Ensure value is between 0 and 1
-    if (value < 0.5) {
+    // Clamp value to the range of 0 to 255
+    value = value.clamp(0, 255);
+
+    // Normalize the value to a range of 0.0 to 1.0
+    double normalizedValue = value / 255.0;
+
+    if (normalizedValue < 0.5) {
       // Interpolate between blue and yellow
-      return Color.lerp(Colors.blue, Colors.yellow, value * 2)!;
+      return Color.lerp(Colors.blue, Colors.yellow, normalizedValue * 2)!;
     } else {
       // Interpolate between yellow and red
-      return Color.lerp(Colors.yellow, Colors.red, (value - 0.5) * 2)!;
+      return Color.lerp(
+          Colors.yellow, Colors.red, (normalizedValue - 0.5) * 2)!;
     }
   }
 
@@ -76,7 +82,7 @@ class _SensorArrayState extends State<SensorArray> {
                 int row = index ~/ widget.cols;
                 int col = index % widget.cols;
                 double sensorValue = widget.sensorValues[row][col];
-                sensorValue = sensorValue > 1.0 ? 1.0 : sensorValue;
+                sensorValue = sensorValue > 255.0 ? 255.0 : sensorValue;
                 return Container(
                   margin: const EdgeInsets.all(1.0),
                   width: widget.sensorSize,

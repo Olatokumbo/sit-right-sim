@@ -35,9 +35,9 @@ class ColorScaleBar extends StatelessWidget {
             children: [
               const Text('0', style: TextStyle(color: Colors.grey)),
               SizedBox(height: height / 3),
-              const Text('0.5', style: TextStyle(color: Colors.grey)),
+              const Text('', style: TextStyle(color: Colors.grey)),
               SizedBox(height: height / 3),
-              const Text('1', style: TextStyle(color: Colors.grey)),
+              const Text('255', style: TextStyle(color: Colors.grey)),
             ],
           ),
           const SizedBox(width: 10),
