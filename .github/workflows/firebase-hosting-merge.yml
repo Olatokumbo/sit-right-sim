@@ -20,7 +20,7 @@ jobs:
         run: flutter pub get
       - name: Create .env file
         run: |
-          cat > .env <<EOF
+          cat > env <<EOF
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           EOF
       - name: Build Flutter Web
