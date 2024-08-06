@@ -4,14 +4,15 @@ import 'package:http/http.dart' as http;
 class PosturePredictionService {
   final String url = "https://main-qtrb3tnorq-uc.a.run.app";
 
-  Future<String> fetchPrediction(List<double> value) async {
+  Future<String> fetchPrediction(Map<String, List<List<double>>> values) async {
+    var flattenedValues = _flattenValues(values);
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({'features': value}),
+        body: jsonEncode({'features': flattenedValues}),
       );
 
       if (response.statusCode == 200) {
@@ -38,5 +39,12 @@ class PosturePredictionService {
     } catch (e) {
       throw Exception("Failed to fetch prediction: $e");
     }
+  }
+
+  List<double> _flattenValues(Map<String, List<List<double>>> sensorData) {
+    return [
+      ...sensorData["backrest"]?.expand((innerList) => innerList) ?? [],
+      ...sensorData["seat"]?.expand((innerList) => innerList) ?? [],
+    ];
   }
 }

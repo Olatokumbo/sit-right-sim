@@ -5,11 +5,11 @@ import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
-import 'package:sit_right_app/data_augmentation.service.dart';
+import 'package:sit_right_app/services/data-augmentation.service.dart';
 import 'package:sit_right_app/models/postureStats.dart';
-import 'package:sit_right_app/openai.dart';
-import 'package:sit_right_app/posture.service.dart';
-import 'package:sit_right_app/posture_prediction.service.dart';
+import 'package:sit_right_app/services/posture.service.dart';
+import 'package:sit_right_app/services/posture-prediction.service.dart';
+import 'package:sit_right_app/services/recommendation.service.dart';
 import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -45,42 +45,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Map<String, List<List<double>>> data = {
+  Map<String, List<List<double>>> sensorData = {
     "backrest": List.generate(5, (index) => List.filled(5, 0.0)),
     "seat": List.generate(5, (index) => List.filled(5, 0.0)),
   };
-  String predictedPosture = "No Posture Detected";
-  String simulatedPosture = 'upright';
-  String aiRecommendation = "";
-
   PostureService postureService = PostureService();
   DataAugmentationService dataAugmentationService = DataAugmentationService();
   PosturePredictionService posturePredictionService =
       PosturePredictionService();
-  var startTime = DateTime.now();
   List<PostureStatistics> postureStatistics = [];
-  var sensorSize = 5;
+  late RecommendationService recommendationService =
+      RecommendationService(postureStatistics);
+  String predictedPosture = "No Posture Detected";
+  String simulatedPosture = 'upright';
+  String aiRecommendation = "";
+  DateTime startTime = DateTime.now();
+  int sensorSize = 5;
   bool loading = false;
 
   Future<void> setPosture(String value) async {
-    setState(() {
-      var postureData = postureService.get(value, sensorSize);
-      var backrest = dataAugmentationService
-          .generateAugmentedDataForPosture(postureData["backrest"]!);
-      var seat = dataAugmentationService
-          .generateAugmentedDataForPosture(postureData["seat"]!);
+    var postureData = postureService.get(value, sensorSize);
+    var backrest = dataAugmentationService
+        .generateAugmentedDataForPosture(postureData["backrest"]!);
+    var seat = dataAugmentationService
+        .generateAugmentedDataForPosture(postureData["seat"]!);
 
-      data = {"backrest": backrest, "seat": seat};
+    setState(() {
+      sensorData = {"backrest": backrest, "seat": seat};
       loading = true;
     });
 
-    List<double> flattenedList = [
-      ...data["backrest"]?.expand((innerList) => innerList) ?? [],
-      ...data["seat"]?.expand((innerList) => innerList) ?? [],
-    ];
-    var posture = await posturePredictionService.fetchPrediction(flattenedList);
+    var posture = await posturePredictionService.fetchPrediction(sensorData);
 
-    var recommendation = await getRecommendations(postureStatistics);
+    var recommendation = await recommendationService.getRecommendations();
 
     setState(() {
       if (predictedPosture != "No Posture Detected") {
@@ -129,14 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
                               rows: sensorSize,
                               cols: sensorSize,
                               sensorSize: 190 / sensorSize,
-                              sensorValues: data["backrest"] ?? [],
+                              sensorValues: sensorData["backrest"] ?? [],
                             ),
                             const SizedBox(height: 10),
                             SensorArray(
                               rows: sensorSize,
                               cols: sensorSize,
                               sensorSize: 190 / sensorSize,
-                              sensorValues: data["seat"] ?? [],
+                              sensorValues: sensorData["seat"] ?? [],
                             ),
                             DropdownWidget(
                               items: const {
