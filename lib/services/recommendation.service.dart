@@ -8,15 +8,13 @@ String generatePrompt(List<PostureStatistics> postures) {
   final buffer = StringBuffer();
 
   var formattedPostures = groupPosture(postures);
-  buffer.writeln(
-      'I have been sitting in the following postures for these durations:');
+  buffer.writeln('I have been sitting in the following postures for these durations:');
 
   for (var posture in formattedPostures) {
     buffer.writeln('${posture.posture} for ${posture.duration} seconds');
   }
 
-  buffer.writeln(
-      'Can you provide a brief one-paragraph recommendation (2 sentence max) based on my current sitting posture? Additionally also highlight trends or patterns in my sitting postures');
+  buffer.writeln('Can you provide a brief one-paragraph recommendation (2 sentence max) based on my current sitting posture? Additionally also highlight trends or patterns in my sitting postures');
 
   return buffer.toString();
 }
@@ -31,6 +29,8 @@ class RecommendationService {
   Future<String> getRecommendations() async {
     _counter++;
 
+    print(_counter);
+
     if (postures.isEmpty) {
       return "";
     }
@@ -40,8 +40,7 @@ class RecommendationService {
     }
 
     final apiKey = dotenv.env["OPENAI_API_KEY"];
-    const url =
-        'https://api.openai.com/v1/completions';
+    const url = 'https://api.openai.com/v1/completions';
 
     final headers = {
       'Content-Type': 'application/json',

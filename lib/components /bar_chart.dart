@@ -35,7 +35,7 @@ class BarChartWidget extends StatelessWidget {
                       minY: -0.5,
                       barTouchData: BarTouchData(enabled: false),
                       titlesData: FlTitlesData(
-                        rightTitles: const AxisTitles(
+                        leftTitles: const AxisTitles(
                           sideTitles: SideTitles(showTitles: false),
                         ),
                         topTitles: const AxisTitles(
@@ -45,8 +45,10 @@ class BarChartWidget extends StatelessWidget {
                           sideTitles: SideTitles(
                             showTitles: true,
                             getTitlesWidget: (double value, TitleMeta meta) {
-                              DateTime startTime = DateTime.now().subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute));
-                              DateTime time = startTime.add(Duration(minutes: value.toInt()));
+                              DateTime startTime = DateTime.now()
+                                  .subtract(const Duration(hours: 2));
+                              DateTime time = startTime
+                                  .add(Duration(minutes: value.toInt()));
                               return Padding(
                                 padding: const EdgeInsets.only(top: 1.0),
                                 child: Text(
@@ -55,18 +57,18 @@ class BarChartWidget extends StatelessWidget {
                                 ),
                               );
                             },
-                            interval: 60, // Display time labels every hour
                           ),
                         ),
-                        leftTitles: AxisTitles(
+                        rightTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
                             reservedSize: 40,
                             getTitlesWidget: (double value, TitleMeta meta) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
                                 child: Text(
-                                  "${(value / 1000000).toStringAsFixed(0)} sec",
+                                  (value / 1000000).toStringAsFixed(0),
                                   style: const TextStyle(fontSize: 10),
                                 ),
                               );
@@ -108,44 +110,26 @@ class BarChartWidget extends StatelessWidget {
   }
 
   List<BarChartGroupData> _createBarGroups(List<PostureStatistics> statistics) {
-    DateTime startTime = DateTime.now().subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute)); // Start at midnight
+    DateTime startTime = DateTime.now().subtract(const Duration(hours: 2));
 
-    // Aggregate data
-    Map<String, Map<int, double>> aggregatedData = {};
-    for (var stat in statistics) {
-      int startMinute = stat.startTime.difference(startTime).inMinutes;
-      int endMinute = stat.endTime.difference(startTime).inMinutes;
-      String posture = stat.posture;
+    return statistics.map((stat) {
+      int x = stat.startTime.difference(startTime).inMinutes;
+      Color barColor = getColorByPosture(stat.posture);
 
-      if (!aggregatedData.containsKey(posture)) {
-        aggregatedData[posture] = {};
-      }
-
-      for (int minute = startMinute; minute <= endMinute; minute++) {
-        aggregatedData[posture]![minute] = (aggregatedData[posture]![minute] ?? 0) + 1;
-      }
-    }
-
-    // Create bar groups from aggregated data
-    List<BarChartGroupData> barGroups = [];
-    aggregatedData.forEach((posture, data) {
-      data.forEach((minute, duration) {
-        barGroups.add(
-          BarChartGroupData(
-            x: minute,
-            barRods: [
-              BarChartRodData(
-                toY: duration,
-                color: getColorByPosture(posture),
-                width: 16,
-              ),
-            ],
+      return BarChartGroupData(
+        x: x,
+        barRods: [
+          BarChartRodData(
+            toY: stat.endTime
+                .difference(stat.startTime)
+                .inMicroseconds
+                .toDouble(),
+            color: barColor,
+            width: 16,
           ),
-        );
-      });
-    });
-
-    return barGroups;
+        ],
+      );
+    }).toList();
   }
 
   double _getMaxY(List<PostureStatistics> statistics) {
@@ -154,13 +138,14 @@ class BarChartWidget extends StatelessWidget {
     }
     double maxTime = statistics
         .map(
-          (stat) => stat.endTime.difference(stat.startTime).inMicroseconds.toDouble(),
+          (stat) =>
+              stat.endTime.difference(stat.startTime).inMicroseconds.toDouble(),
         )
         .reduce((a, b) => a > b ? a : b);
     return maxTime * 1.1;
   }
 
   String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
   }
 }

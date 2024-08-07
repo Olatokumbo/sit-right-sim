@@ -1,10 +1,17 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
+import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
+import 'package:sit_right_app/providers/loading.provider.dart';
+import 'package:sit_right_app/providers/predicted-posture.provider.dart';
+import 'package:sit_right_app/providers/sensor-data.provider.dart';
+import 'package:sit_right_app/providers/sensor-size.provider.dart';
+import 'package:sit_right_app/providers/simulated-posture.provider.dart';
 import 'package:sit_right_app/services/data-augmentation.service.dart';
 import 'package:sit_right_app/models/postureStats.dart';
 import 'package:sit_right_app/services/posture.service.dart';
@@ -14,9 +21,14 @@ import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// Services
+final postureService = PostureService();
+final dataAugmentationService = DataAugmentationService();
+final posturePredictionService = PosturePredictionService();
+
 Future<void> main() async {
   await dotenv.load(fileName: "env");
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,71 +47,71 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-  });
+class MyHomePage extends ConsumerStatefulWidget {
+  const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  Map<String, List<List<double>>> sensorData = {
-    "backrest": List.generate(5, (index) => List.filled(5, 0.0)),
-    "seat": List.generate(5, (index) => List.filled(5, 0.0)),
-  };
-  PostureService postureService = PostureService();
-  DataAugmentationService dataAugmentationService = DataAugmentationService();
-  PosturePredictionService posturePredictionService =
-      PosturePredictionService();
+class _MyHomePageState extends ConsumerState<MyHomePage> {
+  DateTime startTime = DateTime.now();
+
   List<PostureStatistics> postureStatistics = [];
   late RecommendationService recommendationService =
       RecommendationService(postureStatistics);
-  String predictedPosture = "No Posture Detected";
-  String simulatedPosture = 'upright';
-  String aiRecommendation = "";
-  DateTime startTime = DateTime.now();
-  int sensorSize = 5;
-  bool loading = false;
 
   Future<void> setPosture(String value) async {
+    final sensorSize = ref.read(sensorSizeProvider);
     var postureData = postureService.get(value, sensorSize);
     var backrest = dataAugmentationService
         .generateAugmentedDataForPosture(postureData["backrest"]!);
     var seat = dataAugmentationService
         .generateAugmentedDataForPosture(postureData["seat"]!);
 
-    setState(() {
-      sensorData = {"backrest": backrest, "seat": seat};
-      loading = true;
-    });
+    ref.read(sensorDataProvider.notifier).state = {
+      "backrest": backrest,
+      "seat": seat
+    };
+    ref.read(loadingProvider.notifier).state = true;
 
-    var posture = await posturePredictionService.fetchPrediction(sensorData);
+    var posture = await posturePredictionService
+        .fetchPrediction(ref.read(sensorDataProvider));
 
     var recommendation = await recommendationService.getRecommendations();
 
     setState(() {
-      if (predictedPosture != "No Posture Detected") {
-        postureStatistics.add(
-            PostureStatistics(predictedPosture, startTime, DateTime.now()));
+      if (ref.read(predictedPostureProvider.notifier).state !=
+          "No Posture Detected") {
+        postureStatistics.add(PostureStatistics(
+            ref.read(predictedPostureProvider), startTime, DateTime.now()));
       }
-      startTime = DateTime.now();
-      predictedPosture = posture;
-      simulatedPosture = value;
-      aiRecommendation = recommendation;
-      loading = false;
     });
+
+    startTime = DateTime.now();
+    ref.read(predictedPostureProvider.notifier).state = posture;
+    ref.read(simulatedPostureProvider.notifier).state = value;
+    ref.read(aiRecommendationProvider.notifier).state = recommendation;
+    ref.read(loadingProvider.notifier).state = false;
   }
 
   @override
   void initState() {
     super.initState();
-    setPosture(simulatedPosture);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setPosture(ref.read(simulatedPostureProvider));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final sensorData = ref.watch(sensorDataProvider);
+    final sensorSize = ref.watch(sensorSizeProvider);
+    final predictedPosture = ref.watch(predictedPostureProvider);
+    final simulatedPosture = ref.watch(simulatedPostureProvider);
+    final aiRecommendation = ref.watch(aiRecommendationProvider);
+    final loading = ref.watch(loadingProvider);
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
@@ -145,9 +157,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 "32x32": "32"
                               },
                               onValueChanged: (value) async {
-                                setState(() {
-                                  sensorSize = int.parse(value);
-                                });
+                                ref.read(sensorSizeProvider.notifier).state =
+                                    int.parse(value);
                                 await setPosture(simulatedPosture);
                               },
                             ),
