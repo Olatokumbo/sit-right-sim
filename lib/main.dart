@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
+import 'package:sit_right_app/components%20/line_chart.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
@@ -61,6 +62,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late RecommendationService recommendationService =
       RecommendationService(postureStatistics);
 
+  double getValueByPosture(String posture) {
+    switch (posture) {
+      case "Upright":
+        return 1.0;
+      case "Slouching":
+        return 2.0;
+      case "Leaning Left":
+        return 3.0;
+      case "Leaning Right":
+        return 4.0;
+      case "Leaning Back":
+        return 5.0;
+      default:
+        return 0.0;
+    }
+  }
+
   Future<void> setPosture(String value) async {
     final sensorSize = ref.read(sensorSizeProvider);
     var postureData = postureService.get(value, sensorSize);
@@ -84,7 +102,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       if (ref.read(predictedPostureProvider.notifier).state !=
           "No Posture Detected") {
         postureStatistics.add(PostureStatistics(
-            ref.read(predictedPostureProvider), startTime, DateTime.now()));
+            ref.read(predictedPostureProvider),
+            getValueByPosture(posture),
+            startTime,
+            DateTime.now()));
       }
     });
 
@@ -211,38 +232,86 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Row(
-                      children: [
-                        CardComponent(
-                          title: "Sitting Pattern",
-                          child: BarChartWidget(postureStatistics),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        CardComponent(
-                          title: "Statistics",
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.all(20),
+                      margin: EdgeInsets.all(15),
+                      child: DefaultTabController(
+                        length: 3,
+                        child: Scaffold(
+                          backgroundColor: Color.fromRGBO(237, 217, 246, 0.702),
+                          appBar: AppBar(
+                            toolbarHeight: 0,
+                            bottom: const TabBar(
+                              tabs: [
+                                Tab(
+                                    icon:
+                                        Icon(Icons.stacked_line_chart_rounded)),
+                                Tab(icon: Icon(Icons.bar_chart_sharp)),
+                                Tab(icon: Icon(Icons.recommend)),
+                              ],
+                            ),
+                          ),
+                          body: TabBarView(
                             children: [
-                              StatisticsPieChart(postureStatistics),
+                              Row(
+                                children: [
+                                  CardComponent(
+                                    title: "Sitting Pattern",
+                                    child: LineChartComponent(
+                                      data: postureStatistics,
+                                      indicatorLineColor: Colors.blueGrey,
+                                      averageLineColor: Colors.red,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  CardComponent(
+                                    title: "Sitting Pattern",
+                                    child: BarChartWidget(
+                                      postureStatistics,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        CardComponent(
+                                          title: "Statistics",
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              StatisticsPieChart(
+                                                  postureStatistics),
+                                            ],
+                                          ),
+                                        ),
+                                        CardComponent(
+                                          title: "Predicted Posture",
+                                          child: loading
+                                              ? const Text("Loading...")
+                                              : PostureWidget(
+                                                  predictedPosture:
+                                                      predictedPosture),
+                                        ),
+                                        CardComponent(
+                                            title: "AI Recommendation",
+                                            child: Text(aiRecommendation))
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Icon(Icons.warning),
                             ],
                           ),
                         ),
-                        CardComponent(
-                          title: "Predicted Posture",
-                          child: loading
-                              ? const Text("Loading...")
-                              : PostureWidget(
-                                  predictedPosture: predictedPosture),
-                        ),
-                        CardComponent(
-                            title: "AI Recommendation",
-                            child: Text(aiRecommendation))
-                      ],
+                      ),
                     ),
                   ),
                 ],

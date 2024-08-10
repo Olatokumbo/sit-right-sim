@@ -29,8 +29,6 @@ class RecommendationService {
   Future<String> getRecommendations() async {
     _counter++;
 
-    print(_counter);
-
     if (postures.isEmpty) {
       return "";
     }
