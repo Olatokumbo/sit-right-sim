@@ -2,8 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/models/postureStats.dart';
 
-class LineChartComponent extends StatefulWidget {
-  LineChartComponent(
+class LineChartWidget extends StatefulWidget {
+  LineChartWidget(
       {super.key,
       Color? lineColor,
       Color? indicatorLineColor,
@@ -47,10 +47,10 @@ class LineChartComponent extends StatefulWidget {
   List<double> get yValues => const [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
 
   @override
-  State createState() => _LineChartComponentState();
+  State createState() => _LineChartWidgetState();
 }
 
-class _LineChartComponentState extends State<LineChartComponent> {
+class _LineChartWidgetState extends State<LineChartWidget> {
   late double touchedValue;
 
   @override
@@ -134,7 +134,7 @@ class _LineChartComponentState extends State<LineChartComponent> {
     }
 
     String text =
-        '${minutes.toString().padLeft(1, '0')}:${seconds.toString().padLeft(2, '0')} min';
+        '${minutes.toString().padLeft(1, '0')}:${seconds.toString().padLeft(2, '0')} min${minutes > 1 ? "s" : ""}';
 
     return SideTitleWidget(
       axisSide: meta.axisSide,

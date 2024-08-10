@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
-import 'package:sit_right_app/components%20/line_chart.dart';
+import 'package:sit_right_app/components%20/line_chart_widget.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
 import 'package:sit_right_app/components%20/timer.dart';
@@ -261,7 +261,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                 children: [
                                   CardComponent(
                                     title: "Sitting Pattern",
-                                    child: LineChartComponent(
+                                    child: LineChartWidget(
                                       data: postureStatistics,
                                       indicatorLineColor: Colors.blueGrey,
                                       averageLineColor: Colors.red,
