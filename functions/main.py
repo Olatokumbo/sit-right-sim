@@ -4,17 +4,16 @@ import numpy as np
 import json
 import scipy.ndimage
 
-@https_fn.on_request(cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
+@https_fn.on_request(memory=options.MemoryOption.GB_1, cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
 def main(req: https_fn.Request) -> https_fn.Response:
     if req.method == "POST":
         model = joblib.load('neural_network_32x32.pkl')
         print('Model loaded')
         data = req.json
         features = np.array(data['features'])
-
+        
         # Calculate the number of sensors (2 in this case)
         num_sensors = 2
-
         # Determine the original size of each subarray
         total_elements = features.size
         elements_per_sensor = total_elements // num_sensors
@@ -30,6 +29,7 @@ def main(req: https_fn.Request) -> https_fn.Response:
 
         # Split the input array into subarrays
         sensor_arrays = np.split(features, num_sensors)
+
 
         # Resize each subarray to 32x32 using bilinear interpolation
         resized_features = []
