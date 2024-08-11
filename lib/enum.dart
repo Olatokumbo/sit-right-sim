@@ -1,1 +1,1 @@
-enum Postures { upright, slouching, rightLeaning, leftLeaning }
+enum Postures { upright, slouching, rightLeaning, leftLeaning, backLeaning }

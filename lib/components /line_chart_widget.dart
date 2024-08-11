@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sit_right_app/models/postureStats.dart';
+import 'package:sit_right_app/models/posture-statistics.model.dart';
 
 class LineChartWidget extends StatefulWidget {
   LineChartWidget(
@@ -40,11 +40,6 @@ class LineChartWidget extends StatefulWidget {
   final Color tooltipBgColor;
   final Color tooltipTextColor;
   final List<PostureStatistics> data;
-
-  List<String> get weekDays =>
-      const ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-
-  List<double> get yValues => const [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
 
   @override
   State createState() => _LineChartWidgetState();

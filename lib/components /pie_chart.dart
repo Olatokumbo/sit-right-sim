@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:sit_right_app/models/postureStats.dart';
+import 'package:sit_right_app/models/posture-statistics.model.dart';
 import 'package:sit_right_app/utils.dart';
 
 class StatisticsPieChart extends StatelessWidget {

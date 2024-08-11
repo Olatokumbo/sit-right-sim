@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models/postureStats.dart';
-import 'models/posture_chart.dart';
+import 'models/posture-statistics.model.dart';
+import 'models/posture-chart.model.dart';
 
 Color getColorByPosture(String posture) {
   // List of postures and their corresponding colors
@@ -48,4 +48,21 @@ List<PostureChart> groupPosture(List<PostureStatistics> data) {
       .toList();
 
   return groupedList;
+}
+
+double getScoreByPosture(String posture) {
+  switch (posture) {
+    case "Upright":
+      return 1.0;
+    case "Slouching":
+      return 2.0;
+    case "Leaning Left":
+      return 3.0;
+    case "Leaning Right":
+      return 4.0;
+    case "Leaning Back":
+      return 5.0;
+    default:
+      return 0.0;
+  }
 }

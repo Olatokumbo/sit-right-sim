@@ -6,6 +6,7 @@ import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/line_chart_widget.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
 import 'package:sit_right_app/components%20/posture_widget.dart';
+import 'package:sit_right_app/components%20/sitting-quality.chart.dart';
 import 'package:sit_right_app/components%20/timer.dart';
 import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
 import 'package:sit_right_app/providers/loading.provider.dart';
@@ -14,10 +15,12 @@ import 'package:sit_right_app/providers/sensor-data.provider.dart';
 import 'package:sit_right_app/providers/sensor-size.provider.dart';
 import 'package:sit_right_app/providers/simulated-posture.provider.dart';
 import 'package:sit_right_app/services/data-augmentation.service.dart';
-import 'package:sit_right_app/models/postureStats.dart';
+import 'package:sit_right_app/models/posture-statistics.model.dart';
 import 'package:sit_right_app/services/posture.service.dart';
 import 'package:sit_right_app/services/posture-prediction.service.dart';
 import 'package:sit_right_app/services/recommendation.service.dart';
+import 'package:sit_right_app/services/sitting-quality.service.dart';
+import 'package:sit_right_app/utils.dart';
 import "components /dropdown_widget.dart";
 import 'components /sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,6 +29,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 final postureService = PostureService();
 final dataAugmentationService = DataAugmentationService();
 final posturePredictionService = PosturePredictionService();
+final sittingQualityService = SittingQualityService();
 
 Future<void> main() async {
   await dotenv.load(fileName: "env");
@@ -62,29 +66,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   late RecommendationService recommendationService =
       RecommendationService(postureStatistics);
 
-  double getValueByPosture(String posture) {
-    switch (posture) {
-      case "Upright":
-        return 1.0;
-      case "Slouching":
-        return 2.0;
-      case "Leaning Left":
-        return 3.0;
-      case "Leaning Right":
-        return 4.0;
-      case "Leaning Back":
-        return 5.0;
-      default:
-        return 0.0;
-    }
-  }
-
   Future<void> setPosture(String value) async {
     final sensorSize = ref.read(sensorSizeProvider);
-    var postureData = postureService.get(value, sensorSize);
-    var backrest = dataAugmentationService
+
+    Map<String, List<List<double>>> postureData =
+        postureService.get(value, sensorSize);
+    List<List<double>> backrest = dataAugmentationService
         .generateAugmentedDataForPosture(postureData["backrest"]!);
-    var seat = dataAugmentationService
+    List<List<double>> seat = dataAugmentationService
         .generateAugmentedDataForPosture(postureData["seat"]!);
 
     ref.read(sensorDataProvider.notifier).state = {
@@ -93,17 +82,18 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     };
     ref.read(loadingProvider.notifier).state = true;
 
-    var posture = await posturePredictionService
+    String posture = await posturePredictionService
         .fetchPrediction(ref.read(sensorDataProvider));
 
-    var recommendation = await recommendationService.getRecommendations();
+    String recommendation = await recommendationService.getRecommendations();
+    sittingQualityService.calculate(posture, startTime, DateTime.now());
 
     setState(() {
       if (ref.read(predictedPostureProvider.notifier).state !=
           "No Posture Detected") {
         postureStatistics.add(PostureStatistics(
             ref.read(predictedPostureProvider),
-            getValueByPosture(posture),
+            getScoreByPosture(posture),
             startTime,
             DateTime.now()));
       }
@@ -272,10 +262,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               Column(
                                 children: [
                                   CardComponent(
-                                    title: "Sitting Pattern",
-                                    child: BarChartWidget(
-                                      postureStatistics,
-                                    ),
+                                    title: "Sitting Quality",
+                                    child: SittingQualityChart(
+                                        data: sittingQualityService.data,
+                                        startTime: DateTime.now()),
                                   ),
                                   Expanded(
                                     child: Row(
