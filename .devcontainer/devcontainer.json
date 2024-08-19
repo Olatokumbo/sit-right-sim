@@ -1,4 +1,4 @@
 {
-    "name": "Alpine",
-    "image": "mcr.microsoft.com/vscode/devcontainers/typescript-node:16"
+    "name": "Dart",
+    "image": "ghcr.io/devcontainers/templates/alpine:3.2.1"
 }
