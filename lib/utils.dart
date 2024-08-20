@@ -51,18 +51,81 @@ List<PostureChart> groupPosture(List<PostureStatistics> data) {
 }
 
 double getScoreByPosture(String posture) {
+  double spinalLoad = 0.0;
+  double muscleActivity = 0.0;
+  double ergonomicRisk = 0.0;
+
   switch (posture) {
     case "Upright":
-      return 1.0;
+      spinalLoad = 1.0; // Low spinal load in an upright posture
+      muscleActivity = 1.0; // Minimal muscle activity needed
+      ergonomicRisk = 1.0; // Low ergonomic risk
+      break;
     case "Slouching":
-      return 2.0;
+      spinalLoad = 2.5; // Higher spinal load due to poor posture
+      muscleActivity = 3.0; // Increased muscle activity to maintain balance
+      ergonomicRisk = 3.5; // High ergonomic risk
+      break;
     case "Leaning Left":
-      return 3.0;
+      spinalLoad = 3.0; // Asymmetric load on the spine
+      muscleActivity = 2.5; // Moderate muscle activity
+      ergonomicRisk = 2.5; // Moderate ergonomic risk
+      break;
     case "Leaning Right":
-      return 4.0;
+      spinalLoad = -3.0; // Similar to Leaning Left
+      muscleActivity = -2.5; // Similar muscle activity
+      ergonomicRisk = -2.5; // Similar ergonomic risk
+      break;
     case "Leaning Back":
-      return 5.0;
+      spinalLoad = 2.0; // Lower spinal load than slouching but still not ideal
+      muscleActivity = 2.0; // Moderate muscle activity
+      ergonomicRisk = 2.0; // Moderate ergonomic risk
+      break;
     default:
-      return 0.0;
+      return 0; // Default score for undefined postures
   }
+
+  // Calculate the weighted posture score
+  double postureScore =
+      (0.4 * spinalLoad) + (0.3 * muscleActivity) + (0.3 * ergonomicRisk);
+
+  // Map the calculated postureScore to a fixed integer value
+  if (postureScore == 1.00) {
+    return 1; // Upright
+  } else if (postureScore == 2.95) {
+    return 2; // Slouching
+  } else if (postureScore == 2.7) {
+    return 3; // Leaning Left
+  } else if (postureScore == -2.7) {
+    return 4; // Leaning Right
+  } else if (postureScore == 2.0) {
+    return 5; // Leaning Back
+  } else {
+    return 1;
+  }
+}
+
+String getPostureByScore(double score) {
+  String closestPosture = "Unknown";
+  double closestScoreDifference = double.maxFinite;
+
+  List<String> postures = [
+    "Upright",
+    "Slouching",
+    "Leaning Left",
+    "Leaning Right",
+    "Leaning Back"
+  ];
+
+  for (String posture in postures) {
+    double calculatedScore = getScoreByPosture(posture);
+    double scoreDifference = (score - calculatedScore).abs();
+
+    if (scoreDifference < closestScoreDifference) {
+      closestScoreDifference = scoreDifference;
+      closestPosture = posture;
+    }
+  }
+
+  return closestPosture;
 }

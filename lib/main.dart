@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sit_right_app/components%20/bar_chart.dart';
 import 'package:sit_right_app/components%20/card.dart';
 import 'package:sit_right_app/components%20/line_chart_widget.dart';
 import 'package:sit_right_app/components%20/pie_chart.dart';
