@@ -2,45 +2,32 @@ import 'package:sit_right_app/models/sitting-quality.model.dart';
 import 'package:sit_right_app/utils.dart';
 
 class SittingQualityService {
-  double overallQuality = 100;
+  double quality = 1;
+  String? currentPosture;
+  DateTime? postureStartTime;
   List<SittingQuality> data = [];
-
-  // Define a threshold duration in seconds
-  final double durationThreshold = 300; // 5 minutes threshold
+  final double durationThreshold = 10; // 5 minutes threshold
 
   void calculate(String posture, DateTime start, DateTime end) {
+    if (currentPosture == null || currentPosture != posture) {
+      currentPosture = posture;
+      postureStartTime = DateTime.now();
+    }
     double postureScore = getScoreByPosture(posture);
     double normalPostureScore = getScoreByPosture("Upright");
 
     double deviationValue = (postureScore - normalPostureScore).abs();
-    double duration = end.difference(start).inSeconds.toDouble();
+    double duration = end.difference(postureStartTime!).inSeconds.toDouble();
+    double constant = 10;
+    double slope = deviationValue == 0.0 ? 1 : 0;
 
-    // Base decay rate
-    double decayRate = 0.05;
-    double qualityDecay = decayRate * duration;
+    var beta = (constant * deviationValue + slope);
 
-    // Adjust the quality impact based on posture and duration
-    double qualityScoreImpact;
-    if (deviationValue == 0.0) {
-      if (duration >= durationThreshold) {
-        // Decay for prolonged good posture
-        qualityScoreImpact = -decayRate * (duration - durationThreshold);
-      } else {
-        // Reward good posture, no decay yet
-        qualityScoreImpact = 0.5 * duration - qualityDecay;
-      }
-    } else {
-      // Larger impact for non-upright postures
-      qualityScoreImpact = -deviationValue * duration - qualityDecay;
-    }
+    var qqQuality = 1 / (1 + deviationValue + beta * duration);
 
-    // Apply the quality score impact
-    overallQuality += qualityScoreImpact;
-
-    // Ensure overallQuality remains within bounds [0, 100]
-    overallQuality = overallQuality.clamp(0, 100);
+    quality = qqQuality;
 
     // Log the quality change at the current time
-    data.add(SittingQuality(overallQuality, DateTime.now()));
+    data.add(SittingQuality(quality, DateTime.now()));
   }
 }

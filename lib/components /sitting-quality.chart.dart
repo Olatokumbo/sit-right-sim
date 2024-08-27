@@ -16,7 +16,7 @@ class SittingQualityChart extends StatelessWidget {
     return Column(
       children: <Widget>[
         AspectRatio(
-          aspectRatio: 3.4,
+          aspectRatio: 3.2,
           child: Padding(
             padding: const EdgeInsets.only(
               right: 18,
@@ -43,7 +43,7 @@ class SittingQualityChart extends StatelessWidget {
       case 0:
         text = 'Bad';
         break;
-      case 100:
+      case 1:
         text = 'Good';
         break;
       default:
@@ -82,7 +82,7 @@ class SittingQualityChart extends StatelessWidget {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minY: 0,
-      maxY: 100,
+      maxY: 1,
       lineBarsData: [
         LineChartBarData(
           spots: data.map((e) {

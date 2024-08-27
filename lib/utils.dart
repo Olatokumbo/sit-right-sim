@@ -105,6 +105,23 @@ double getScoreByPosture(String posture) {
   }
 }
 
+getPostureStartQuality(String posture) {
+  switch (posture) {
+    case "Upright":
+      return 100.0;
+    case "Slouching":
+      return 70.0;
+    case "Leaning Left":
+      return 80.0;
+    case "Leaning Right":
+      return 80.0;
+    case "Leaning Back":
+      return 90.0;
+    default:
+      return 0.0; // Default score for undefined postures
+  }
+}
+
 String getPostureByScore(double score) {
   String closestPosture = "Unknown";
   double closestScoreDifference = double.maxFinite;
