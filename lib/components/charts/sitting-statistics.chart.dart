@@ -3,10 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:sit_right_app/models/posture-statistics.model.dart';
 import 'package:sit_right_app/utils.dart';
 
-class StatisticsPieChart extends StatelessWidget {
+class SittingStatisticsChart extends StatelessWidget {
   final List<PostureStatistics> data;
 
-  const StatisticsPieChart(this.data, {super.key});
+  const SittingStatisticsChart(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {

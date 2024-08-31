@@ -2,8 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sit_right_app/models/posture-statistics.model.dart';
 
-class LineChartWidget extends StatefulWidget {
-  LineChartWidget(
+class SittingPatternChart extends StatefulWidget {
+  SittingPatternChart(
       {super.key,
       Color? lineColor,
       Color? indicatorLineColor,
@@ -42,10 +42,10 @@ class LineChartWidget extends StatefulWidget {
   final List<PostureStatistics> data;
 
   @override
-  State createState() => _LineChartWidgetState();
+  State createState() => _SittingPatternChartState();
 }
 
-class _LineChartWidgetState extends State<LineChartWidget> {
+class _SittingPatternChartState extends State<SittingPatternChart> {
   late double touchedValue;
 
   @override

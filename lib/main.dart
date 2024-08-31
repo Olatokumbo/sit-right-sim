@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sit_right_app/components%20/card.dart';
-import 'package:sit_right_app/components%20/line_chart_widget.dart';
-import 'package:sit_right_app/components%20/pie_chart.dart';
-import 'package:sit_right_app/components%20/posture_widget.dart';
-import 'package:sit_right_app/components%20/sitting-quality.chart.dart';
-import 'package:sit_right_app/components%20/timer.dart';
+import 'package:sit_right_app/components/card.component.dart';
+import 'package:sit_right_app/components/charts/sitting-pattern.chart.dart';
+import 'package:sit_right_app/components/charts/sitting-statistics.chart.dart';
+import 'package:sit_right_app/components/posture-indicator.dart';
+import 'package:sit_right_app/components/charts/sitting-quality.chart.dart';
+import 'package:sit_right_app/components/timer.component.dart';
 import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
 import 'package:sit_right_app/providers/loading.provider.dart';
 import 'package:sit_right_app/providers/predicted-posture.provider.dart';
@@ -20,8 +20,8 @@ import 'package:sit_right_app/services/posture-prediction.service.dart';
 import 'package:sit_right_app/services/recommendation.service.dart';
 import 'package:sit_right_app/services/sitting-quality.service.dart';
 import 'package:sit_right_app/utils.dart';
-import "components /dropdown_widget.dart";
-import 'components /sensor-array.dart';
+import "components/dropdown.component.dart";
+import 'components/sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Services
@@ -226,12 +226,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: EdgeInsets.all(20),
-                      margin: EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.all(15),
                       child: DefaultTabController(
                         length: 3,
                         child: Scaffold(
-                          backgroundColor: Color.fromRGBO(237, 217, 246, 0.702),
+                          backgroundColor:
+                              const Color.fromRGBO(237, 217, 246, 0.702),
                           appBar: AppBar(
                             toolbarHeight: 0,
                             bottom: const TabBar(
@@ -250,7 +251,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                 children: [
                                   CardComponent(
                                     title: "Sitting Pattern",
-                                    child: LineChartWidget(
+                                    child: SittingPatternChart(
                                       data: postureStatistics,
                                       indicatorLineColor: Colors.blueGrey,
                                       averageLineColor: Colors.red,
@@ -275,7 +276,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              StatisticsPieChart(
+                                              SittingStatisticsChart(
                                                   postureStatistics),
                                             ],
                                           ),
@@ -284,7 +285,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                           title: "Predicted Posture",
                                           child: loading
                                               ? const Text("Loading...")
-                                              : PostureWidget(
+                                              : PostureIndicator(
                                                   predictedPosture:
                                                       predictedPosture),
                                         ),

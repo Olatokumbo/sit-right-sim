@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'color_scale_bar.dart';
+import 'color-scalebar.component.dart';
 
 class SensorArray extends StatefulWidget {
   final int rows;

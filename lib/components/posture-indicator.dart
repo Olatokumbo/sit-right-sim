@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class PostureWidget extends StatelessWidget {
-  const PostureWidget({
+class PostureIndicator extends StatelessWidget {
+  const PostureIndicator({
     super.key,
     required this.predictedPosture,
   });
@@ -40,7 +40,7 @@ class PostureWidget extends StatelessWidget {
           child: SvgPicture.asset(
             "./assets/${findPosture(predictedPosture)}.svg",
             height: 170,
-            color: Colors.amber,
+            colorFilter: const ColorFilter.mode(Colors.amber, BlendMode.srcIn),
           ),
         )
       ],
