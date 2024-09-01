@@ -8,6 +8,7 @@ import 'package:sit_right_app/components/posture-indicator.dart';
 import 'package:sit_right_app/components/charts/sitting-quality.chart.dart';
 import 'package:sit_right_app/components/timer.component.dart';
 import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
+import 'package:sit_right_app/providers/hausdorff-distance.provider.dart';
 import 'package:sit_right_app/providers/loading.provider.dart';
 import 'package:sit_right_app/providers/predicted-posture.provider.dart';
 import 'package:sit_right_app/providers/sensor-data.provider.dart';
@@ -106,7 +107,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.read(aiRecommendationProvider.notifier).state = recommendation;
     ref.read(loadingProvider.notifier).state = false;
 
-    weightedHausdorffDistanceService.calculate(backrest, seat, postureService);
+    ref.read(hausdorffDistanceProvider.notifier).state =
+        weightedHausdorffDistanceService.calculate(
+            backrest, seat, sensorSize, postureService);
   }
 
   @override
@@ -124,6 +127,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final predictedPosture = ref.watch(predictedPostureProvider);
     final simulatedPosture = ref.watch(simulatedPostureProvider);
     final aiRecommendation = ref.watch(aiRecommendationProvider);
+    final hausdorffDistance = ref.watch(hausdorffDistanceProvider);
     final loading = ref.watch(loadingProvider);
 
     return Scaffold(
@@ -142,6 +146,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 children: [
                   CardComponent(
                     title: "Sensor Array",
+                    subtitle:
+                        "Hausdorff Distance: Backrest = ${hausdorffDistance["backrest"]} | Seat = ${hausdorffDistance["seat"]}",
                     flex: 3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

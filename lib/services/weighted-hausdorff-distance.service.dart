@@ -60,10 +60,10 @@ class WeightedHausdorffDistanceService {
     return points;
   }
 
-  void calculate(List<List<double>> backrest, List<List<double>> seat,
-      PostureService postureService) {
-    var uprightPosture =
-        postureService.postures["upright"] as Map<String, List<List<double>>>;
+  Map<String, double> calculate(List<List<double>> backrest,
+      List<List<double>> seat, int gridSize, PostureService postureService) {
+    Map<String, List<List<double>>> uprightPosture =
+        postureService.get("upright", gridSize);
 
     // Extract points from matrices with a default weight
     List<Point> uprightBackrestPoints =
@@ -80,7 +80,10 @@ class WeightedHausdorffDistanceService {
     double seatDistance =
         weightedHausdorffDistance(uprightSeatPoints, otherSeatPoints);
 
-    print("Weighted Hausdorff distance (backrest): $backrestDistance");
-    print("Weighted Hausdorff distance (seat): $seatDistance");
+    // Round the distances to 2 decimal places
+    backrestDistance = double.parse(backrestDistance.toStringAsFixed(3));
+    seatDistance = double.parse(seatDistance.toStringAsFixed(3));
+
+    return {"backrest": backrestDistance, "seat": seatDistance};
   }
 }
