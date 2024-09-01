@@ -15,6 +15,7 @@ import 'package:sit_right_app/providers/sensor-size.provider.dart';
 import 'package:sit_right_app/providers/simulated-posture.provider.dart';
 import 'package:sit_right_app/services/data-augmentation.service.dart';
 import 'package:sit_right_app/models/posture-statistics.model.dart';
+import 'package:sit_right_app/services/weighted-hausdorff-distance.service.dart';
 import 'package:sit_right_app/services/posture.service.dart';
 import 'package:sit_right_app/services/posture-prediction.service.dart';
 import 'package:sit_right_app/services/recommendation.service.dart';
@@ -29,6 +30,7 @@ final postureService = PostureService();
 final dataAugmentationService = DataAugmentationService();
 final posturePredictionService = PosturePredictionService();
 final sittingQualityService = SittingQualityService();
+final weightedHausdorffDistanceService = WeightedHausdorffDistanceService();
 
 Future<void> main() async {
   await dotenv.load(fileName: "env");
@@ -103,6 +105,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.read(simulatedPostureProvider.notifier).state = value;
     ref.read(aiRecommendationProvider.notifier).state = recommendation;
     ref.read(loadingProvider.notifier).state = false;
+
+    weightedHausdorffDistanceService.calculate(backrest, seat, postureService);
   }
 
   @override

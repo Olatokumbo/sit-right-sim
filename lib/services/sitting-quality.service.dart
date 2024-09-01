@@ -6,7 +6,8 @@ class SittingQualityService {
   String? currentPosture;
   DateTime? postureStartTime;
   List<SittingQuality> data = [];
-  final double durationThreshold = 10; // 5 minutes threshold
+
+  final double durationThreshold = 10; // 10 seconds
 
   void calculate(String posture, DateTime start, DateTime end) {
     if (currentPosture == null || currentPosture != posture) {
@@ -18,14 +19,18 @@ class SittingQualityService {
 
     double deviationValue = (postureScore - normalPostureScore).abs();
     double duration = end.difference(postureStartTime!).inSeconds.toDouble();
-    double constant = 10;
-    double slope = deviationValue == 0.0 ? 1 : 0;
+    double constant = 0.10;
+    double slope = deviationValue == 0.0 ? 0.2 : 0;
 
     var beta = (constant * deviationValue + slope);
 
     var qqQuality = 1 / (1 + deviationValue + beta * duration);
 
     quality = qqQuality;
+
+    if (posture == "Upright" && duration < durationThreshold) {
+      quality = 1;
+    }
 
     // Log the quality change at the current time
     data.add(SittingQuality(quality, DateTime.now()));
