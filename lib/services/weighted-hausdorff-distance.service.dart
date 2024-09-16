@@ -47,13 +47,13 @@ class WeightedHausdorffDistanceService {
     );
   }
 
-  List<Point> extractPointsFromMatrix(List<List<double>> matrix,
-      {double weight = 1.0}) {
+  List<Point> extractPointsFromMatrix(List<List<double>> matrix) {
     List<Point> points = [];
     for (int i = 0; i < matrix.length; i++) {
       for (int j = 0; j < matrix[i].length; j++) {
-        if (matrix[i][j] > 0) {
-          points.add(Point(i.toDouble(), j.toDouble(), weight: weight));
+        double pressureValue = matrix[i][j];
+        if (pressureValue > 0) {
+          points.add(Point(i.toDouble(), j.toDouble(), weight: pressureValue));
         }
       }
     }
