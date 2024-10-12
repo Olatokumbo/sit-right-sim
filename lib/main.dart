@@ -23,6 +23,7 @@ import 'package:sit_right_app/services/recommendation.service.dart';
 import 'package:sit_right_app/services/sitting-quality.service.dart';
 import 'package:sit_right_app/utils.dart';
 import "components/dropdown.component.dart";
+import 'components/gauge.component.dart';
 import 'components/sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -146,8 +147,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 children: [
                   CardComponent(
                     title: "Sensor Array",
-                    subtitle:
-                        "Hausdorff Distance: Backrest = ${hausdorffDistance["backrest"]} | Seat = ${hausdorffDistance["seat"]}",
                     flex: 3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -257,7 +256,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ),
                           body: TabBarView(
                             children: [
-                              Row(
+                              Column(
                                 children: [
                                   CardComponent(
                                     title: "Sitting Pattern",
@@ -269,6 +268,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                   )
                                 ],
                               ),
+                              // 2nd Tab
                               Column(
                                 children: [
                                   CardComponent(
@@ -307,7 +307,45 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                   ),
                                 ],
                               ),
-                              const Icon(Icons.warning),
+                              // 3rd Tab
+                              Column(
+                                children: [
+                                  CardComponent(
+                                      title: "Hausdorff Distance",
+                                      child: Row(
+                                        children: [
+                                          Gauge(
+                                            title:
+                                                "Backrest: ${hausdorffDistance["backrest"]}",
+                                            value: hausdorffDistance["backrest"]
+                                                    ?.toDouble() ??
+                                                0,
+                                          ),
+                                          Gauge(
+                                              title:
+                                                  "Seat: ${hausdorffDistance["seat"]}",
+                                              value: hausdorffDistance["seat"]
+                                                      ?.toDouble() ??
+                                                  0)
+                                        ],
+                                      )),
+                                  const Expanded(
+                                    child: Row(
+                                      children: [
+                                        CardComponent(
+                                          title: "",
+                                        ),
+                                        CardComponent(
+                                          title: "",
+                                        ),
+                                        CardComponent(
+                                          title: "",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
