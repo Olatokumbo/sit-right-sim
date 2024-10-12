@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sit_right_app/utils.dart';
 
 class PostureIndicator extends StatelessWidget {
   const PostureIndicator({
@@ -8,23 +9,6 @@ class PostureIndicator extends StatelessWidget {
   });
 
   final String predictedPosture;
-
-  findPosture(String predictedPosture) {
-    switch (predictedPosture) {
-      case "Upright":
-        return 'upright';
-      case "Slouching":
-        return "slouching";
-      case "Leaning Left":
-        return "leftLeaning";
-      case "Leaning Right":
-        return "rightLeaning";
-      case "Leaning Back":
-        return "backLeaning";
-      default:
-        return "empty";
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

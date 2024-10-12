@@ -130,6 +130,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final aiRecommendation = ref.watch(aiRecommendationProvider);
     final hausdorffDistance = ref.watch(hausdorffDistanceProvider);
     final loading = ref.watch(loadingProvider);
+    final double scoreSum = getScoreByPosture(predictedPosture).abs() +
+        (hausdorffDistance["backrest"]?.toDouble() ?? 0.0) +
+        (hausdorffDistance["seat"]?.toDouble() ?? 0.0);
+
+// Avoid division by zero or invalid values
+    final postureScore = (scoreSum > 0)
+        ? (100 / scoreSum).toInt()
+        : 100; // Default to 100 if the scoreSum is 0 or less
 
     return Scaffold(
         appBar: AppBar(
@@ -311,34 +319,41 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               Column(
                                 children: [
                                   CardComponent(
-                                      title: "Hausdorff Distance",
-                                      child: Row(
-                                        children: [
-                                          Gauge(
+                                    title: "Hausdorff Distance",
+                                    child: Row(
+                                      children: [
+                                        Gauge(
+                                          title:
+                                              "Backrest: ${hausdorffDistance["backrest"]}",
+                                          value: hausdorffDistance["backrest"]
+                                                  ?.toDouble() ??
+                                              0,
+                                        ),
+                                        Gauge(
                                             title:
-                                                "Backrest: ${hausdorffDistance["backrest"]}",
-                                            value: hausdorffDistance["backrest"]
+                                                "Seat: ${hausdorffDistance["seat"]}",
+                                            value: hausdorffDistance["seat"]
                                                     ?.toDouble() ??
-                                                0,
-                                          ),
-                                          Gauge(
-                                              title:
-                                                  "Seat: ${hausdorffDistance["seat"]}",
-                                              value: hausdorffDistance["seat"]
-                                                      ?.toDouble() ??
-                                                  0)
-                                        ],
-                                      )),
-                                  const Expanded(
+                                                0)
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
                                     child: Row(
                                       children: [
                                         CardComponent(
+                                          title: "Posture Score (%)",
+                                          child: Text(
+                                            style: const TextStyle(
+                                                fontSize: 50,
+                                                fontWeight: FontWeight.bold),
+                                            "$postureScore/100",
+                                          ),
+                                        ),
+                                        const CardComponent(
                                           title: "",
                                         ),
-                                        CardComponent(
-                                          title: "",
-                                        ),
-                                        CardComponent(
+                                        const CardComponent(
                                           title: "",
                                         ),
                                       ],

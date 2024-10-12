@@ -50,6 +50,23 @@ List<PostureChart> groupPosture(List<PostureStatistics> data) {
   return groupedList;
 }
 
+String findPosture(String predictedPosture) {
+  switch (predictedPosture) {
+    case "Upright":
+      return 'upright';
+    case "Slouching":
+      return "slouching";
+    case "Leaning Left":
+      return "leftLeaning";
+    case "Leaning Right":
+      return "rightLeaning";
+    case "Leaning Back":
+      return "backLeaning";
+    default:
+      return "empty";
+  }
+}
+
 double getScoreByPosture(String posture) {
   double spinalLoad = 0.0;
   double muscleActivity = 0.0;
@@ -89,60 +106,5 @@ double getScoreByPosture(String posture) {
   double postureScore =
       (0.4 * spinalLoad) + (0.3 * muscleActivity) + (0.3 * ergonomicRisk);
 
-  // Map the calculated postureScore to a fixed integer value
-  if (postureScore == 1.00) {
-    return 1; // Upright
-  } else if (postureScore == 2.95) {
-    return 2; // Slouching
-  } else if (postureScore == 2.7) {
-    return 3; // Leaning Left
-  } else if (postureScore == -2.7) {
-    return 4; // Leaning Right
-  } else if (postureScore == 2.0) {
-    return 5; // Leaning Back
-  } else {
-    return 1;
-  }
-}
-
-getPostureStartQuality(String posture) {
-  switch (posture) {
-    case "Upright":
-      return 100.0;
-    case "Slouching":
-      return 70.0;
-    case "Leaning Left":
-      return 80.0;
-    case "Leaning Right":
-      return 80.0;
-    case "Leaning Back":
-      return 90.0;
-    default:
-      return 0.0; // Default score for undefined postures
-  }
-}
-
-String getPostureByScore(double score) {
-  String closestPosture = "Unknown";
-  double closestScoreDifference = double.maxFinite;
-
-  List<String> postures = [
-    "Upright",
-    "Slouching",
-    "Leaning Left",
-    "Leaning Right",
-    "Leaning Back"
-  ];
-
-  for (String posture in postures) {
-    double calculatedScore = getScoreByPosture(posture);
-    double scoreDifference = (score - calculatedScore).abs();
-
-    if (scoreDifference < closestScoreDifference) {
-      closestScoreDifference = scoreDifference;
-      closestPosture = posture;
-    }
-  }
-
-  return closestPosture;
+  return postureScore;
 }

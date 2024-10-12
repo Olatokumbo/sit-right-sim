@@ -137,6 +137,22 @@ class _SittingPatternChartState extends State<SittingPatternChart> {
     );
   }
 
+  double getValueByPosture(double postureScore) {
+    if (postureScore == 1.00) {
+      return 1; // Upright
+    } else if (postureScore == 2.95) {
+      return 2; // Slouching
+    } else if (postureScore == 2.7) {
+      return 3; // Leaning Left
+    } else if (postureScore == -2.7) {
+      return 4; // Leaning Right
+    } else if (postureScore == 2.0) {
+      return 5; // Leaning Back
+    } else {
+      return 1;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -148,121 +164,6 @@ class _SittingPatternChartState extends State<SittingPatternChart> {
             padding: const EdgeInsets.only(right: 5.0, left: 5.0),
             child: LineChart(
               LineChartData(
-                // lineTouchData: LineTouchData(
-                //   getTouchedSpotIndicator:
-                //       (LineChartBarData barData, List<int> spotIndexes) {
-                //     return spotIndexes.map((spotIndex) {
-                //       final spot = barData.spots[spotIndex];
-                //       if (spot.x == 0 || spot.x == 6) {
-                //         return null;
-                //       }
-                //       return TouchedSpotIndicatorData(
-                //         FlLine(
-                //           color: widget.indicatorTouchedLineColor,
-                //           strokeWidth: 4,
-                //         ),
-                //         FlDotData(
-                //           getDotPainter: (spot, percent, barData, index) {
-                //             if (index.isEven) {
-                //               return FlDotCirclePainter(
-                //                 radius: 8,
-                //                 color: Colors.white,
-                //                 strokeWidth: 5,
-                //                 strokeColor:
-                //                     widget.indicatorTouchedSpotStrokeColor,
-                //               );
-                //             } else {
-                //               return FlDotSquarePainter(
-                //                 size: 16,
-                //                 color: Colors.white,
-                //                 strokeWidth: 5,
-                //                 strokeColor:
-                //                     widget.indicatorTouchedSpotStrokeColor,
-                //               );
-                //             }
-                //           },
-                //         ),
-                //       );
-                //     }).toList();
-                //   },
-                //   touchTooltipData: LineTouchTooltipData(
-                //     getTooltipColor: (touchedSpot) => widget.tooltipBgColor,
-                //     getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                //       return touchedBarSpots.map((barSpot) {
-                //         final flSpot = barSpot;
-                //         if (flSpot.x == 0 || flSpot.x == 6) {
-                //           return null;
-                //         }
-
-                //         TextAlign textAlign;
-                //         switch (flSpot.x.toInt()) {
-                //           case 1:
-                //             textAlign = TextAlign.left;
-                //             break;
-                //           case 5:
-                //             textAlign = TextAlign.right;
-                //             break;
-                //           default:
-                //             textAlign = TextAlign.center;
-                //         }
-
-                //         return LineTooltipItem(
-                //           '${widget.weekDays[flSpot.x.toInt()]} \n',
-                //           TextStyle(
-                //             color: widget.tooltipTextColor,
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //           children: [
-                //             TextSpan(
-                //               text: flSpot.y.toString(),
-                //               style: TextStyle(
-                //                 color: widget.tooltipTextColor,
-                //                 fontWeight: FontWeight.w900,
-                //               ),
-                //             ),
-                //             const TextSpan(
-                //               text: ' k ',
-                //               style: TextStyle(
-                //                 fontStyle: FontStyle.italic,
-                //                 fontWeight: FontWeight.w900,
-                //               ),
-                //             ),
-                //             const TextSpan(
-                //               text: 'calories',
-                //               style: TextStyle(
-                //                 fontWeight: FontWeight.normal,
-                //               ),
-                //             ),
-                //           ],
-                //           textAlign: textAlign,
-                //         );
-                //       }).toList();
-                //     },
-                //   ),
-                //   touchCallback:
-                //       (FlTouchEvent event, LineTouchResponse? lineTouch) {
-                //     if (!event.isInterestedForInteractions ||
-                //         lineTouch == null ||
-                //         lineTouch.lineBarSpots == null) {
-                //       setState(() {
-                //         touchedValue = -1;
-                //       });
-                //       return;
-                //     }
-                //     final value = lineTouch.lineBarSpots![0].x;
-
-                //     if (value == 0 || value == 6) {
-                //       setState(() {
-                //         touchedValue = -1;
-                //       });
-                //       return;
-                //     }
-
-                //     setState(() {
-                //       touchedValue = value;
-                //     });
-                //   },
-                // ),
                 extraLinesData: ExtraLinesData(
                   horizontalLines: [
                     HorizontalLine(
@@ -283,7 +184,9 @@ class _SittingPatternChartState extends State<SittingPatternChart> {
                               widget.data[0]?.startTime ?? DateTime.now())
                           .inSeconds
                           .toDouble();
-                      return FlSpot(timeDifferenceInSeconds, e.value);
+
+                      return FlSpot(
+                          timeDifferenceInSeconds, getValueByPosture(e.value));
                     }).toList(),
                     isCurved: true,
                     barWidth: 4,

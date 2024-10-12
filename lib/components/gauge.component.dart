@@ -21,12 +21,14 @@ class Gauge extends StatelessWidget {
               axes: <RadialAxis>[
                 RadialAxis(
                     showAxisLine: false,
-                    showLabels: false,
+                    // showLabels: false,
                     showTicks: false,
                     startAngle: 180,
                     endAngle: 360,
                     maximum: 0.2,
                     canScaleToFit: true,
+                    showLastLabel: true,
+                    // maximumLabels: 20,
                     pointers: <GaugePointer>[
                       NeedlePointer(
                           value: value,
@@ -39,7 +41,7 @@ class Gauge extends StatelessWidget {
                           endValue: 18,
                           sizeUnit: GaugeSizeUnit.factor,
                           startWidth: 0,
-                          endWidth: 0.1,
+                          endWidth: 0.05, //originally 0.1
                           color: const Color(0xFFA8AAE2)),
                       GaugeRange(
                           startValue: 20,
