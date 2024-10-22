@@ -183,6 +183,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                 "25x25": "25",
                                 "32x32": "32"
                               },
+                              value: ref
+                                  .read(sensorSizeProvider.notifier)
+                                  .state
+                                  .toString(),
                               onValueChanged: (value) async {
                                 ref.read(sensorSizeProvider.notifier).state =
                                     int.parse(value);
