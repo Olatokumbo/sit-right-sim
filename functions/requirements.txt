@@ -2,3 +2,4 @@ firebase_functions~=0.4.1
 numpy
 joblib
 scikit-learn
+scipy

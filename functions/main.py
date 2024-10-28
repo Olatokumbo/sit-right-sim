@@ -1,52 +1,66 @@
 from firebase_functions import https_fn, options
-import joblib
-import numpy as np
+from process_request import process_data
+from model import load_model, make_prediction
+from hausdorff import calculate_hausdorff, calculate_weighted_hausdorff
 import json
-import scipy.ndimage
+import numpy as np
 
 @https_fn.on_request(memory=options.MemoryOption.GB_1, cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
 def main(req: https_fn.Request) -> https_fn.Response:
     if req.method == "POST":
-        model = joblib.load('neural_network_32x32.pkl')
-        print('Model loaded')
-        data = req.json
-        features = np.array(data['features'])
-        
-        # Calculate the number of sensors (2 in this case)
-        num_sensors = 2
-        # Determine the original size of each subarray
-        total_elements = features.size
-        elements_per_sensor = total_elements // num_sensors
-        original_size = int(np.sqrt(elements_per_sensor))
+        try:
+            data = req.json
+            features = data['features']
+        except KeyError:
+            return https_fn.Response(
+                json.dumps({'error': 'Invalid input data format'}),
+                status=400,
+                mimetype='application/json'
+            )
 
-        # Check if the elements_per_sensor forms a perfect square
-        if original_size * original_size != elements_per_sensor:
+        # Process the data (resize and transform)
+        processed_features = process_data(features)
+        if processed_features is None:
             return https_fn.Response(
                 json.dumps({'error': 'Input data does not form a square matrix'}),
                 status=400,
                 mimetype='application/json'
             )
 
-        # Split the input array into subarrays
-        sensor_arrays = np.split(features, num_sensors)
+        # Load the model and make prediction
+        model = load_model('neural_network_32x32.pkl')
+        prediction = make_prediction(model, processed_features)
 
-
-        # Resize each subarray to 32x32 using bilinear interpolation
-        resized_features = []
-        for sensor_array in sensor_arrays:
-            reshaped_array = np.reshape(sensor_array, (original_size, original_size))
-            resized_array = scipy.ndimage.zoom(reshaped_array, (32 / original_size, 32 / original_size), order=1)
-            resized_features.append(resized_array.flatten())
-
-        # Combine the resized features into one array
-        processed_features = np.concatenate(resized_features)
-
-        # Make a prediction
-        prediction = model.predict([processed_features])
-        print(prediction)
-
-        # Convert the prediction to a JSON serializable format
+        # Return the response
         response_data = {'prediction': prediction.tolist()}
+        return https_fn.Response(json.dumps(response_data), mimetype='application/json')
+
+    return https_fn.Response('OK', status=200)
+
+
+@https_fn.on_request(memory=options.MemoryOption.GB_1, cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
+def hausdorff_distance(req: https_fn.Request) -> https_fn.Response:
+    if req.method == "POST":
+        data = req.json
+        upright_backrest = np.array(data['upright_backrest'])
+        upright_seat = np.array(data['upright_seat'])
+        posture_backrest = np.array(data['posture_backrest'])
+        posture_seat = np.array(data['posture_seat'])
+
+        # Calculate Hausdorff distances between pairs
+        hausdorff_backrest = calculate_hausdorff(upright_backrest, posture_backrest)
+        hausdorff_seat = calculate_hausdorff(upright_seat, posture_seat)
+        
+        weight_hausdorff_backrest = calculate_weighted_hausdorff(upright_backrest, posture_backrest)
+        weight_hausdorff_seat = calculate_weighted_hausdorff(upright_seat, posture_seat)
+
+        # Response data with both Hausdorff distances
+        response_data = {
+            'hausdorff_backrest': hausdorff_backrest,
+            'hausdorff_seat': hausdorff_seat,
+            'weighted_hausdorff_backrest': weight_hausdorff_backrest,
+            'weighted_hausdorff_seat': weight_hausdorff_seat,
+        }
 
         return https_fn.Response(json.dumps(response_data), mimetype='application/json')
 
