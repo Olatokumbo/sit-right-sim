@@ -5,14 +5,17 @@ class PosturePredictionService {
   final String url = "https://main-qtrb3tnorq-uc.a.run.app";
 
   Future<String> fetchPrediction(Map<String, List<List<double>>> values) async {
-    var flattenedValues = _flattenValues(values);
+    print(values["backrest"]);
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({'features': flattenedValues}),
+        body: jsonEncode({
+          'posture_backrest': values["backrest"],
+          'posture_seat': values["seat"]
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -39,12 +42,5 @@ class PosturePredictionService {
     } catch (e) {
       throw Exception("Failed to fetch prediction: $e");
     }
-  }
-
-  List<double> _flattenValues(Map<String, List<List<double>>> sensorData) {
-    return [
-      ...sensorData["backrest"]?.expand((innerList) => innerList) ?? [],
-      ...sensorData["seat"]?.expand((innerList) => innerList) ?? [],
-    ];
   }
 }

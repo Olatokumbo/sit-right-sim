@@ -31,7 +31,7 @@ def calculate_weighted_hausdorff(upright_array, posture_array):
             weighted_distances.append(weighted_distance)
             
             # Debug: Print each distance and weight
-            print(f"i: {i}, j: {j}, distance: {distance}, weight: {weight}, weighted_distance: {weighted_distance}")
+            # print(f"i: {i}, j: {j}, distance: {distance}, weight: {weight}, weighted_distance: {weighted_distance}")
 
     # The weighted Hausdorff distance is the maximum of the weighted distances
     return max(weighted_distances)
@@ -43,10 +43,5 @@ def calculate_weighted_hausdorff(upright_array, posture_array):
 def calculate_hausdorff(array1, array2):
     """Calculates the Hausdorff distance between two feature arrays."""
     
-    # Assuming your arrays are flattened and each pair of values is [x, y]
-    array1_reshaped = array1.reshape(-1, 2)  # Reshape to have 2 columns
-    array2_reshaped = array2.reshape(-1, 2)  # Reshape to have 2 columns
-    
-    # Calculate the Hausdorff distance
-    hausdorff_dist, _, _ = directed_hausdorff(array1_reshaped, array2_reshaped)
+    hausdorff_dist1, _, _ = directed_hausdorff(array1, array2)
     return hausdorff_dist
