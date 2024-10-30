@@ -5,7 +5,6 @@ class PosturePredictionService {
   final String url = "https://main-qtrb3tnorq-uc.a.run.app";
 
   Future<String> fetchPrediction(Map<String, List<List<double>>> values) async {
-    print(values["backrest"]);
     try {
       final response = await http.post(
         Uri.parse(url),
