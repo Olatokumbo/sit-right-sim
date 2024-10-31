@@ -45,7 +45,7 @@ def main(req: https_fn.Request) -> https_fn.Response:
     return https_fn.Response('OK', status=200)
 
 
-@https_fn.on_request(memory=options.MemoryOption.GB_1, cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
+@https_fn.on_request(memory=options.MemoryOption.GB_4, cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
 def hausdorff_distance(req: https_fn.Request) -> https_fn.Response:
     if req.method == "POST":
         try:

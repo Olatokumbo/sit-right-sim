@@ -43,5 +43,5 @@ def calculate_weighted_hausdorff(upright_array, posture_array):
 def calculate_hausdorff(array1, array2):
     """Calculates the Hausdorff distance between two feature arrays."""
     
-    hausdorff_dist1, _, _ = directed_hausdorff(array1, array2)
+    hausdorff_dist, _, _ = directed_hausdorff(array1, array2)
     return hausdorff_dist
