@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial.distance import directed_hausdorff
+from scipy.spatial import distance
 
 def calculate_weighted_hausdorff(upright_array, posture_array):
     """Calculates the weighted Hausdorff distance between two NxN pressure arrays."""
@@ -10,34 +11,21 @@ def calculate_weighted_hausdorff(upright_array, posture_array):
     
     n = upright_array.shape[0]  # Get the size of the square matrix (NxN)
     
-    # Generate coordinates for the NxN grid
-    upright_coords = np.array(np.meshgrid(np.arange(n), np.arange(n))).T.reshape(-1, 2)
+    # Generate coordinates for the NxN grid for both arrays
+    coords = np.array(np.meshgrid(np.arange(n), np.arange(n))).T.reshape(-1, 2)
     
-    # Flatten the arrays to 1D for processing
+    # Flatten arrays and normalize the values for better weighting
     upright_flat = upright_array.flatten()
     posture_flat = posture_array.flatten()
+
+    # Calculate pairwise Euclidean distances between each point
+    distance_matrix = distance.cdist(coords, coords, 'euclidean')
     
-    # Initialize weighted distances
-    weighted_distances = []
-
-    # Calculate weighted Hausdorff distances
-    for i in range(len(upright_flat)):
-        for j in range(len(posture_flat)):
-            distance = np.linalg.norm(upright_coords[i] - upright_coords[j])  # Euclidean distance
-            weight = min(upright_flat[i], posture_flat[j])  # Use the smaller pressure value for weighting
-            
-            # Append the weighted distance
-            weighted_distance = distance * weight
-            weighted_distances.append(weighted_distance)
-            
-            # Debug: Print each distance and weight
-            # print(f"i: {i}, j: {j}, distance: {distance}, weight: {weight}, weighted_distance: {weighted_distance}")
-
-    # The weighted Hausdorff distance is the maximum of the weighted distances
-    return max(weighted_distances)
-
-
-
+    # Compute weighted Hausdorff distances
+    weighted_distances = distance_matrix * np.minimum.outer(upright_flat, posture_flat)
+    
+    # Return the maximum weighted distance
+    return np.max(weighted_distances)
 
 
 def calculate_hausdorff(array1, array2):
