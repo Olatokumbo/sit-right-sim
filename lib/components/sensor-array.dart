@@ -88,8 +88,7 @@ class _SensorArrayState extends State<SensorArray> {
                   width: widget.sensorSize,
                   height: widget.sensorSize,
                   decoration: BoxDecoration(
-                    color: _getColorFromValue(
-                        sensorValue), // Use color based on sensor value
+                    color: _getColorFromValue(sensorValue),
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(2),
                   ),

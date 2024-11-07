@@ -99,9 +99,7 @@ class _SittingPatternChartState extends State<SittingPatternChart> {
       fontWeight: FontWeight.bold,
       color: Colors.blueGrey,
       fontFamily: 'Digital',
-      fontSize: 14 *
-          chartWidth /
-          500, // Adjust the font size based on the chart width
+      fontSize: 14 * chartWidth / 500,
     );
 
     // Convert value to minutes and seconds

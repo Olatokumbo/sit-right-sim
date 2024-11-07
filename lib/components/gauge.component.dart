@@ -24,14 +24,12 @@ class Gauge extends StatelessWidget {
               axes: <RadialAxis>[
                 RadialAxis(
                     showAxisLine: false,
-                    // showLabels: false,
                     showTicks: false,
                     startAngle: 180,
                     endAngle: 360,
                     maximum: 1,
                     canScaleToFit: true,
                     showLastLabel: true,
-                    // maximumLabels: 20,
                     pointers: <GaugePointer>[
                       NeedlePointer(
                           value: value,
