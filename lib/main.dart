@@ -109,7 +109,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.read(loadingProvider.notifier).state = false;
 
     ref.read(hausdorffDistanceProvider.notifier).state =
-        weightedHausdorffDistanceService.calculate(
+        await weightedHausdorffDistanceService.calculate(
             backrest, seat, sensorSize, postureService);
   }
 
@@ -323,7 +323,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               Column(
                                 children: [
                                   CardComponent(
-                                    title: "Hausdorff Distance",
+                                    title:
+                                        "Hausdorff Distance with Procrustes Analysis",
                                     child: Row(
                                       children: [
                                         Gauge(
@@ -347,12 +348,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                       children: [
                                         CardComponent(
                                           title: "Posture Score (%)",
-                                          child: Text(
-                                            style: const TextStyle(
-                                                fontSize: 50,
-                                                fontWeight: FontWeight.bold),
-                                            "$postureScore/100",
-                                          ),
+                                          child: loading
+                                              ? const Text("Loading...")
+                                              : Text(
+                                                  style: const TextStyle(
+                                                      fontSize: 50,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  "$postureScore/100",
+                                                ),
                                         ),
                                         const CardComponent(
                                           title: "",

@@ -12,9 +12,12 @@ class Gauge extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
           Expanded(
             child: SfRadialGauge(
@@ -25,7 +28,7 @@ class Gauge extends StatelessWidget {
                     showTicks: false,
                     startAngle: 180,
                     endAngle: 360,
-                    maximum: 0.2,
+                    maximum: 1,
                     canScaleToFit: true,
                     showLastLabel: true,
                     // maximumLabels: 20,
