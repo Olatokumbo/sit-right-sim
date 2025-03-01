@@ -1,195 +1,26 @@
+import 'dart:math';
+import 'package:sit_right_app/postures/back_leaning_posture.dart';
+import 'package:sit_right_app/postures/left_leaning_posture.dart';
+import 'package:sit_right_app/postures/right_leaning_posture.dart';
+import 'package:sit_right_app/postures/slouching_posture.dart';
+import 'package:sit_right_app/postures/upright_posture.dart';
+
 class PostureService {
-  final Map<String, Map<String, List<List<double>>>> postures = {
-    "upright": {
-      "backrest": [
-        [64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
-        [64, 178, 178, 204, 178, 204, 178, 204, 204, 64],
-        [64, 204, 204, 229, 204, 229, 204, 229, 229, 64],
-        [64, 178, 178, 204, 178, 204, 178, 204, 204, 64],
-        [64, 178, 178, 204, 178, 204, 178, 204, 204, 64],
-        [64, 178, 178, 204, 178, 204, 178, 204, 204, 64],
-        [64, 204, 204, 229, 204, 229, 204, 229, 229, 64],
-        [64, 178, 178, 204, 178, 204, 178, 204, 204, 64],
-        [64, 204, 204, 229, 204, 229, 204, 229, 229, 64],
-        [64, 204, 204, 229, 204, 229, 204, 229, 229, 64],
-      ],
-      "seat": [
-        [64, 229, 204, 229, 204, 229, 204, 229, 229, 64],
-        [64, 204, 204, 229, 204, 204, 204, 229, 204, 64],
-        [64, 204, 204, 229, 204, 204, 204, 229, 204, 64],
-        [64, 204, 204, 229, 64, 64, 204, 229, 204, 64],
-        [64, 229, 204, 204, 64, 64, 204, 204, 229, 64],
-        [64, 204, 204, 204, 64, 64, 204, 204, 204, 64],
-        [64, 229, 204, 204, 64, 64, 204, 204, 229, 64],
-        [64, 204, 179, 179, 64, 64, 204, 179, 179, 64],
-        [64, 127, 127, 127, 64, 64, 127, 127, 127, 64],
-        [64, 127, 127, 153, 64, 64, 127, 153, 127, 64],
-      ]
-    },
-    "slouching": {
-      "backrest": [
-        [64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
-        [64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
-        [64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
-        [64, 76, 76, 76, 76, 76, 76, 76, 76, 64],
-        [64, 102, 102, 102, 102, 102, 102, 102, 102, 64],
-        [64, 127, 127, 127, 127, 127, 127, 127, 127, 64],
-        [64, 127, 127, 127, 127, 127, 127, 127, 127, 64],
-        [64, 153, 153, 153, 153, 153, 153, 153, 153, 64],
-        [64, 178, 178, 178, 178, 178, 178, 178, 178, 64],
-        [64, 204, 204, 204, 204, 204, 204, 204, 204, 64],
-      ],
-      "seat": [
-        [64, 229, 204, 229, 204, 229, 204, 229, 229, 64],
-        [64, 204, 204, 229, 204, 204, 204, 229, 204, 64],
-        [64, 204, 204, 229, 204, 204, 204, 229, 204, 64],
-        [64, 204, 204, 229, 64, 64, 204, 229, 204, 64],
-        [64, 229, 204, 204, 64, 64, 204, 204, 229, 64],
-        [64, 204, 204, 204, 64, 64, 204, 204, 204, 64],
-        [64, 229, 204, 204, 64, 64, 204, 204, 229, 64],
-        [64, 204, 179, 179, 64, 64, 204, 179, 179, 64],
-        [64, 127, 127, 127, 64, 64, 127, 127, 127, 64],
-        [64, 127, 127, 153, 64, 64, 127, 153, 127, 64],
-      ]
-    },
-    "leftLeaning": {
-      "backrest": [
-        [64, 204, 204, 179, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 153, 153, 127, 102, 76, 64],
-      ],
-      "seat": [
-        [64, 229, 229, 204, 178, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 178, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 178, 153, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-        [64, 229, 229, 204, 64, 64, 127, 102, 76, 64],
-      ]
-    },
-    "rightLeaning": {
-      "backrest": [
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64],
-        [64, 127, 102, 127, 153, 153, 229, 229, 204, 64]
-      ],
-      "seat": [
-        [64, 76, 102, 127, 178, 153, 229, 229, 204, 64],
-        [64, 76, 102, 127, 178, 153, 229, 229, 204, 64],
-        [64, 76, 102, 127, 178, 153, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 102, 127, 64, 64, 229, 229, 204, 64],
-        [64, 76, 127, 127, 64, 64, 229, 229, 204, 64]
-      ]
-    },
-    "backLeaning": {
-      "backrest": [
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64],
-        [64, 230, 230, 204, 230, 230, 204, 204, 204, 64]
-      ],
-      "seat": [
-        [64, 179, 179, 179, 179, 179, 179, 179, 179, 64],
-        [64, 204, 204, 204, 204, 204, 204, 204, 204, 64],
-        [64, 230, 230, 230, 230, 230, 230, 230, 230, 64],
-        [64, 230, 230, 230, 64, 64, 230, 230, 230, 64],
-        [64, 230, 230, 230, 64, 64, 230, 230, 230, 64],
-        [64, 204, 204, 204, 64, 64, 204, 204, 204, 64],
-        [64, 179, 179, 179, 64, 64, 179, 179, 179, 64],
-        [64, 179, 179, 179, 64, 64, 179, 179, 179, 64],
-        [64, 179, 179, 179, 64, 64, 179, 179, 179, 64],
-        [64, 179, 179, 179, 64, 64, 179, 179, 179, 64]
-      ]
-    }
-  };
-
-  // Method to get posture data scaled to gridSize
   Map<String, List<List<double>>> get(String posture, int gridSize) {
-    if (postures.containsKey(posture)) {
-      return scalePosture(postures[posture]!, gridSize);
+    int randomNumber = Random().nextInt(23);
+    switch (posture) {
+      case "upright":
+        return upright[randomNumber];
+      case "slouching":
+        return slouching[randomNumber];
+      case "leftLeaning":
+        return left_leaning[randomNumber];
+      case "rightLeaning":
+        return right_leaning[randomNumber];
+      case "backLeaning":
+        return back_leaning[randomNumber];
+      default:
+        return {"backrest": [], "seat": []};
     }
-    return {"backrest": [], "seat": []};
-  }
-
-  Map<String, List<List<double>>> scalePosture(
-      Map<String, List<List<double>>> postureData, int desiredGridSize) {
-    Map<String, List<List<double>>> scaledPosture = {};
-
-    for (String component in postureData.keys) {
-      List<List<double>> componentGrid = postureData[component]!;
-      int originalGridSize = componentGrid.length;
-
-      // Calculate scaling factors
-      double scaleX = originalGridSize / desiredGridSize;
-      double scaleY = originalGridSize / desiredGridSize;
-
-      // Initialize scaled component grid with desiredGridSize length
-      List<List<double>> scaledComponentGrid = List.generate(
-          desiredGridSize, (index) => List.filled(desiredGridSize, 0.0));
-
-      // Perform bilinear interpolation
-      for (int y = 0; y < desiredGridSize; y++) {
-        for (int x = 0; x < desiredGridSize; x++) {
-          double originX = x * scaleX;
-          double originY = y * scaleY;
-
-          int x1 = originX.floor().clamp(0, originalGridSize - 1);
-          int x2 = (originX.ceil()).clamp(0, originalGridSize - 1);
-          int y1 = originY.floor().clamp(0, originalGridSize - 1);
-          int y2 = (originY.ceil()).clamp(0, originalGridSize - 1);
-
-          double value = bilinearInterpolation(
-              componentGrid[y1][x1],
-              componentGrid[y1][x2],
-              componentGrid[y2][x1],
-              componentGrid[y2][x2],
-              originX - x1,
-              originY - y1);
-
-          scaledComponentGrid[y][x] = value;
-        }
-      }
-
-      scaledPosture[component] = scaledComponentGrid;
-    }
-
-    return scaledPosture;
-  }
-
-// Bilinear interpolation function
-  double bilinearInterpolation(double q11, double q12, double q21, double q22,
-      double xFraction, double yFraction) {
-    double topRow = q11 * (1 - xFraction) + q21 * xFraction;
-    double bottomRow = q12 * (1 - xFraction) + q22 * xFraction;
-    return topRow * (1 - yFraction) + bottomRow * yFraction;
   }
 }

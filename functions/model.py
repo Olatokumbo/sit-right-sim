@@ -1,13 +1,13 @@
-import joblib
+from tensorflow.keras.models import load_model
+import numpy as np
 
-def load_model(model_path):
+def load_trained_model(model_path):
     """Load the pre-trained machine learning model."""
-    model = joblib.load(model_path)
-    print('Model loaded')
+    model = load_model(model_path)  # Corrected loading method
+    print('Model loaded successfully.')
     return model
 
-def make_prediction(model, processed_features):
-    """Make a prediction based on the processed features."""
-    prediction = model.predict([processed_features])
-    print('Prediction:', prediction)
+def make_prediction(model, features):
+    reshaped_features = np.array(features).reshape(1, 32, 32, 2)
+    prediction = model.predict(reshaped_features)
     return prediction

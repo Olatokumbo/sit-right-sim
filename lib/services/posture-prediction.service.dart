@@ -20,16 +20,20 @@ class PosturePredictionService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        switch (data["prediction"][0] as int) {
-          case 4:
-            return "Upright";
-          case 3:
-            return "Slouching";
-          case 1:
-            return "Leaning Left";
-          case 2:
-            return "Leaning Right";
+        List<double> prediction = List<double>.from(data["prediction"][0]);
+        int predictedClassIndex =
+            prediction.indexOf(prediction.reduce((a, b) => a > b ? a : b));
+
+        switch (predictedClassIndex) {
           case 0:
+            return "Upright";
+          case 1:
+            return "Slouching";
+          case 2:
+            return "Leaning Left";
+          case 3:
+            return "Leaning Right";
+          case 4:
             return "Leaning Back";
           default:
             return "Unknown";

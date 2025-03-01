@@ -3,3 +3,4 @@ numpy
 joblib
 scikit-learn
 scipy
+tensorflow

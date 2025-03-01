@@ -6,7 +6,8 @@ import 'package:sit_right_app/components/charts/sitting-pattern.chart.dart';
 import 'package:sit_right_app/components/charts/sitting-statistics.chart.dart';
 import 'package:sit_right_app/components/posture-indicator.dart';
 import 'package:sit_right_app/components/charts/sitting-quality.chart.dart';
-import 'package:sit_right_app/components/timer.component.dart';
+import 'package:sit_right_app/components/simulation-control.component.dart';
+// import 'package:sit_right_app/components/timer.component.dart';
 import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
 import 'package:sit_right_app/providers/hausdorff-distance.provider.dart';
 import 'package:sit_right_app/providers/loading.provider.dart';
@@ -20,12 +21,15 @@ import 'package:sit_right_app/services/weighted-hausdorff-distance.service.dart'
 import 'package:sit_right_app/services/posture.service.dart';
 import 'package:sit_right_app/services/posture-prediction.service.dart';
 import 'package:sit_right_app/services/recommendation.service.dart';
+// import 'package:sit_right_app/services/simulation.service.dart';
 import 'package:sit_right_app/services/sitting-quality.service.dart';
 import 'package:sit_right_app/utils.dart';
-import "components/dropdown.component.dart";
+// import "components/dropdown.component.dart";
 import 'components/gauge.component.dart';
 import 'components/sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'providers/simulation.provider.dart';
 
 // Services
 final postureService = PostureService();
@@ -74,10 +78,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     Map<String, List<List<double>>> postureData =
         postureService.get(value, sensorSize);
-    List<List<double>> backrest = dataAugmentationService
-        .generateAugmentedDataForPosture(postureData["backrest"]!);
-    List<List<double>> seat = dataAugmentationService
-        .generateAugmentedDataForPosture(postureData["seat"]!);
+
+    List<List<double>> backrest = postureData["backrest"]!;
+    List<List<double>> seat = postureData["seat"]!;
 
     ref.read(sensorDataProvider.notifier).state = {
       "backrest": backrest,
@@ -116,7 +119,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Get the SimulationService from the provider
+      final simulationService = ref.read(simulationServiceProvider);
+
+      // Set the ref and posture change callback
+      simulationService.setRef(ref);
+      simulationService.setPostureChangeCallback(setPosture);
+
       setPosture(ref.read(simulatedPostureProvider));
     });
   }
@@ -126,7 +137,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final sensorData = ref.watch(sensorDataProvider);
     final sensorSize = ref.watch(sensorSizeProvider);
     final predictedPosture = ref.watch(predictedPostureProvider);
-    final simulatedPosture = ref.watch(simulatedPostureProvider);
+    // final simulatedPosture = ref.watch(simulatedPostureProvider);
     final aiRecommendation = ref.watch(aiRecommendationProvider);
     final hausdorffDistance = ref.watch(hausdorffDistanceProvider);
     final loading = ref.watch(loadingProvider);
@@ -134,7 +145,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         (hausdorffDistance["backrest"]?.toDouble() ?? 0.0) +
         (hausdorffDistance["seat"]?.toDouble() ?? 0.0);
 
-// Avoid division by zero or invalid values
+    // Avoid division by zero or invalid values
     final postureScore = (scoreSum > 0)
         ? (100 / scoreSum).toInt()
         : 100; // Default to 100 if the scoreSum is 0 or less
@@ -155,7 +166,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 children: [
                   CardComponent(
                     title: "Sensor Array",
-                    flex: 3,
+                    flex: 2,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -174,62 +185,58 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               sensorSize: 190 / sensorSize,
                               sensorValues: sensorData["seat"] ?? [],
                             ),
-                            DropdownWidget(
-                              items: const {
-                                "5x5": "5",
-                                "10x10": "10",
-                                "15x15": "15",
-                                "20x20": "20",
-                                "25x25": "25",
-                                "32x32": "32"
-                              },
-                              value: ref
-                                  .read(sensorSizeProvider.notifier)
-                                  .state
-                                  .toString(),
-                              onValueChanged: (value) async {
-                                ref.read(sensorSizeProvider.notifier).state =
-                                    int.parse(value);
-                                await setPosture(simulatedPosture);
-                              },
-                            ),
                           ],
                         )
                       ],
                     ),
                   ),
                   Expanded(
+                    flex: 1,
                     child: Row(
                       children: [
-                        CardComponent(
-                          title: "Simulated Posture",
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        Expanded(
+                          flex: 3,
+                          child: Column(
                             children: [
-                              DropdownWidget(
-                                items: const {
-                                  "Upright": "upright",
-                                  "Slouching": "slouching",
-                                  "Leaning Left": "leftLeaning",
-                                  "Leaning Right": "rightLeaning",
-                                  "Leaning Back": "backLeaning"
-                                },
-                                onValueChanged: (String value) async {
-                                  setPosture(value);
-                                },
+                              SimulationControlPanel(
+                                onPostureChange: setPosture,
                               ),
-                              IconButton(
-                                  onPressed: () async {
-                                    await setPosture(simulatedPosture);
-                                  },
-                                  icon: const Icon(Icons.refresh))
+                              // const Divider(),
+                              // const Text("Manual Control:",
+                              //     style:
+                              //         TextStyle(fontWeight: FontWeight.bold)),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.center,
+                              //   children: [
+                              //     DropdownWidget(
+                              //       items: const {
+                              //         "Upright": "upright",
+                              //         "Slouching": "slouching",
+                              //         "Leaning Left": "leftLeaning",
+                              //         "Leaning Right": "rightLeaning",
+                              //         "Leaning Back": "backLeaning"
+                              //       },
+                              //       onValueChanged: (String value) async {
+                              //         setPosture(value);
+                              //       },
+                              //     ),
+                              //     IconButton(
+                              //         onPressed: () async {
+                              //           await setPosture(simulatedPosture);
+                              //         },
+                              //         icon: const Icon(Icons.refresh))
+                              //   ],
+                              // ),
                             ],
                           ),
                         ),
-                        const CardComponent(
-                          title: "Timer",
-                          child: TimerComponent(),
-                        ),
+                        // const Expanded(
+                        //   flex: 1,
+                        //   child: CardComponent(
+                        //     title: "Timer",
+                        //     child: TimerComponent(),
+                        //   ),
+                        // ),
                       ],
                     ),
                   )

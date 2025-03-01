@@ -21,20 +21,20 @@ def main(req: https_fn.Request) -> https_fn.Response:
             )
 
         # Process the data (resize and transform)
-        scaledPosture = process_data(backrest, seat)
+        # scaledPosture = process_data(backrest, seat)
         
-        if scaledPosture is None:
-            return https_fn.Response(
-                json.dumps({'error': 'Input data does not form a square matrix'}),
-                status=400,
-                mimetype='application/json'
-            )
+        # if scaledPosture is None:
+        #     return https_fn.Response(
+        #         json.dumps({'error': 'Input data does not form a square matrix'}),
+        #         status=400,
+        #         mimetype='application/json'
+        #     )
 
         # Load the model and make prediction
-        model = load_model('neural_network_32x32.pkl')
+        model = load_model('cnn_model.h5')
                
         # Combine and flatten the matrices for prediction
-        combined_features = np.concatenate((scaledPosture["backrest"].flatten(), scaledPosture["seat"].flatten()))
+        combined_features = np.concatenate((backrest.flatten(), seat.flatten()))
         
         prediction = make_prediction(model, combined_features.tolist())
 
