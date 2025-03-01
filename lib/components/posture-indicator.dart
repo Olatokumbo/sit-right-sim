@@ -21,11 +21,15 @@ class PostureIndicator extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: SvgPicture.asset(
-            "./assets/${findPosture(predictedPosture)}.svg",
+          child: Image.asset(
+            "./assets/${findPosture(predictedPosture)}.png",
             height: 170,
-            colorFilter: const ColorFilter.mode(Colors.amber, BlendMode.srcIn),
           ),
+          // child: SvgPicture.asset(
+          //   "./assets/${findPosture(predictedPosture)}.svg",
+          //   height: 170,
+          //   colorFilter: const ColorFilter.mode(Colors.amber, BlendMode.srcIn),
+          // ),
         )
       ],
     );
