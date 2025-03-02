@@ -312,11 +312,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                         ),
                                         CardComponent(
                                           title: "Predicted Posture",
-                                          child: loading
-                                              ? const Text("Loading...")
-                                              : PostureIndicator(
-                                                  predictedPosture:
-                                                      predictedPosture),
+                                          child: PostureIndicator(
+                                              predictedPosture:
+                                                  predictedPosture),
                                         ),
                                         CardComponent(
                                             title: "AI Recommendation",

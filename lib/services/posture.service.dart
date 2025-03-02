@@ -7,7 +7,7 @@ import 'package:sit_right_app/postures/upright_posture.dart';
 
 class PostureService {
   Map<String, List<List<double>>> get(String posture, int gridSize) {
-    int randomNumber = Random().nextInt(23);
+    int randomNumber = Random().nextInt(99);
     switch (posture) {
       case "upright":
         return upright[randomNumber];

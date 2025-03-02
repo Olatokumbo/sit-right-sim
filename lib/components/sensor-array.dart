@@ -57,7 +57,7 @@ class _SensorArrayState extends State<SensorArray> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ColorScaleBar(
-            height: widget.cols * widget.sensorSize + (widget.cols - 1) * 2,
+            height: widget.cols * widget.sensorSize + (widget.cols - 1) * 1.8,
           ),
           Container(
             decoration: BoxDecoration(
@@ -67,9 +67,9 @@ class _SensorArrayState extends State<SensorArray> {
             padding: EdgeInsets.all(widget.sensorSize / 1.5),
             constraints: BoxConstraints(
               maxWidth: widget.cols * widget.sensorSize +
-                  (widget.cols - 1) * 2, // 2 is the margin
+                  (widget.cols - 1) * 1.8, // 2 is the margin
               maxHeight: widget.rows * widget.sensorSize +
-                  (widget.rows - 1) * 2, // 2 is the margin
+                  (widget.rows - 1) * 1.8, // 2 is the margin
             ),
             child: GridView.builder(
               itemCount: widget.rows * widget.cols,
