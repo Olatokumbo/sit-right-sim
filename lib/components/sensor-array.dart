@@ -41,11 +41,11 @@ class _SensorArrayState extends State<SensorArray> {
 
     if (normalizedValue < 0.5) {
       // Interpolate between blue and yellow
-      return Color.lerp(Colors.blue, Colors.yellow, normalizedValue * 2)!;
+      return Color.lerp(Colors.blue, Colors.yellow, normalizedValue * 25)!;
     } else {
       // Interpolate between yellow and red
       return Color.lerp(
-          Colors.yellow, Colors.red, (normalizedValue - 0.5) * 2)!;
+          Colors.yellow, Colors.red, (normalizedValue - 0.5) * 25)!;
     }
   }
 
@@ -61,7 +61,7 @@ class _SensorArrayState extends State<SensorArray> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 1, 26, 28),
+              color: Color.fromARGB(255, 0, 0, 0),
               borderRadius: BorderRadius.circular(20),
             ),
             padding: EdgeInsets.all(widget.sensorSize / 1.5),
