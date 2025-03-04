@@ -7,6 +7,7 @@ class SensorArray extends StatefulWidget {
   final double sensorSize;
   final bool showNumbers;
   final List<List<double>> sensorValues;
+  final bool flipHorizontal; // Added this parameter
 
   const SensorArray({
     super.key,
@@ -15,6 +16,7 @@ class SensorArray extends StatefulWidget {
     required this.sensorValues,
     this.sensorSize = 20.0,
     this.showNumbers = false,
+    this.flipHorizontal = false, // Default is no flip
   });
 
   @override
@@ -53,61 +55,76 @@ class _SensorArrayState extends State<SensorArray> {
   Widget build(BuildContext context) {
     return Center(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ColorScaleBar(
-            height: widget.cols * widget.sensorSize + (widget.cols - 1) * 1.8,
-          ),
-          Container(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Always keep color bar on the left
+            ColorScaleBar(
+              height: widget.cols * widget.sensorSize + (widget.cols - 1) * 1.8,
+            ),
+            // Only flip the grid, not its position
+            widget.flipHorizontal
+                ? Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..scale(-1.0, 1.0, 1.0), // Y-axis flip
+                    child: _buildSensorGrid(),
+                  )
+                : _buildSensorGrid(),
+          ]),
+    );
+  }
+
+  Widget _buildSensorGrid() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 0, 0, 0),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.all(widget.sensorSize / 1.5),
+      constraints: BoxConstraints(
+        maxWidth: widget.cols * widget.sensorSize +
+            (widget.cols - 1) * 1.8, // 2 is the margin
+        maxHeight: widget.rows * widget.sensorSize +
+            (widget.rows - 1) * 1.8, // 2 is the margin
+      ),
+      child: GridView.builder(
+        itemCount: widget.rows * widget.cols,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: widget.cols,
+          crossAxisSpacing: 2.0,
+          mainAxisSpacing: 2.0,
+        ),
+        itemBuilder: (context, index) {
+          int row = index ~/ widget.cols;
+          int col = widget.flipHorizontal
+              ? (widget.cols - 1) -
+                  (index % widget.cols) // Reverse column order
+              : index % widget.cols;
+          double sensorValue = widget.sensorValues[row][col];
+          sensorValue = sensorValue > 255.0 ? 255.0 : sensorValue;
+          return Container(
+            margin: const EdgeInsets.all(1.0),
+            width: widget.sensorSize,
+            height: widget.sensorSize,
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 0, 0, 0),
-              borderRadius: BorderRadius.circular(20),
+              color: _getColorFromValue(sensorValue),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(2),
             ),
-            padding: EdgeInsets.all(widget.sensorSize / 1.5),
-            constraints: BoxConstraints(
-              maxWidth: widget.cols * widget.sensorSize +
-                  (widget.cols - 1) * 1.8, // 2 is the margin
-              maxHeight: widget.rows * widget.sensorSize +
-                  (widget.rows - 1) * 1.8, // 2 is the margin
+            child: Center(
+              child: widget.showNumbers
+                  ? Text(
+                      '$row,$col\n${sensorValue.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: widget.sensorSize / 3,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
-            child: GridView.builder(
-              itemCount: widget.rows * widget.cols,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: widget.cols,
-                crossAxisSpacing: 2.0,
-                mainAxisSpacing: 2.0,
-              ),
-              itemBuilder: (context, index) {
-                int row = index ~/ widget.cols;
-                int col = index % widget.cols;
-                double sensorValue = widget.sensorValues[row][col];
-                sensorValue = sensorValue > 255.0 ? 255.0 : sensorValue;
-                return Container(
-                  margin: const EdgeInsets.all(1.0),
-                  width: widget.sensorSize,
-                  height: widget.sensorSize,
-                  decoration: BoxDecoration(
-                    color: _getColorFromValue(sensorValue),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: Center(
-                    child: widget.showNumbers
-                        ? Text(
-                            '$row,$col\n${sensorValue.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontSize: widget.sensorSize / 3,
-                              color: Colors.white,
-                            ),
-                          )
-                        : null,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

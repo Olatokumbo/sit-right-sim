@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sit_right_app/components/card.component.dart';
 import 'package:sit_right_app/components/charts/sitting-pattern.chart.dart';
 import 'package:sit_right_app/components/charts/sitting-statistics.chart.dart';
+import 'package:sit_right_app/components/posture-demo.dart';
 import 'package:sit_right_app/components/posture-indicator.dart';
 import 'package:sit_right_app/components/charts/sitting-quality.chart.dart';
 import 'package:sit_right_app/components/simulation-control.component.dart';
@@ -165,26 +166,35 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   CardComponent(
-                    title: "Sensor Array",
+                    title: "Visual Representation",
                     flex: 2,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Column(
+                        Row(
                           children: [
-                            SensorArray(
-                              rows: sensorSize,
-                              cols: sensorSize,
-                              sensorSize: 190 / sensorSize,
-                              sensorValues: sensorData["backrest"] ?? [],
+                            Column(
+                              children: [
+                                SensorArray(
+                                  rows: sensorSize,
+                                  cols: sensorSize,
+                                  sensorSize: 190 / sensorSize,
+                                  sensorValues: sensorData["backrest"] ?? [],
+                                  flipHorizontal: true,
+                                ),
+                                const SizedBox(height: 10),
+                                SensorArray(
+                                  rows: sensorSize,
+                                  cols: sensorSize,
+                                  sensorSize: 190 / sensorSize,
+                                  sensorValues: sensorData["seat"] ?? [],
+                                  flipHorizontal: true,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                            SensorArray(
-                              rows: sensorSize,
-                              cols: sensorSize,
-                              sensorSize: 190 / sensorSize,
-                              sensorValues: sensorData["seat"] ?? [],
-                            ),
+                            PostureDemo(
+                              predictedPosture: predictedPosture,
+                            )
                           ],
                         )
                       ],
@@ -313,8 +323,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                         CardComponent(
                                           title: "Predicted Posture",
                                           child: PostureIndicator(
-                                              predictedPosture:
-                                                  predictedPosture),
+                                            predictedPosture: predictedPosture,
+                                          ),
                                         ),
                                         CardComponent(
                                             title: "AI Recommendation",
