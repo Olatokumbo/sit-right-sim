@@ -7,7 +7,7 @@ class SensorArray extends StatefulWidget {
   final double sensorSize;
   final bool showNumbers;
   final List<List<double>> sensorValues;
-  final bool flipHorizontal; // Added this parameter
+  final bool flipHorizontal;
 
   const SensorArray({
     super.key,
@@ -16,7 +16,7 @@ class SensorArray extends StatefulWidget {
     required this.sensorValues,
     this.sensorSize = 20.0,
     this.showNumbers = false,
-    this.flipHorizontal = false, // Default is no flip
+    this.flipHorizontal = false,
   });
 
   @override
@@ -67,7 +67,7 @@ class _SensorArrayState extends State<SensorArray> {
                 ? Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.identity()
-                      ..scale(-1.0, 1.0, 1.0), // Y-axis flip
+                      ..scale(1.0, 1.0, 1.0),
                     child: _buildSensorGrid(),
                   )
                 : _buildSensorGrid(),

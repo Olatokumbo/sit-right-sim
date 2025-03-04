@@ -15,7 +15,7 @@ class PostureDemo extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Image.asset(
             "./assets/demo/${findPosture(predictedPosture)}.png",
-            height: 450,
+            height: 400,
           ),
         )
       ],
