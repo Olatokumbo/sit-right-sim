@@ -58,11 +58,9 @@ class _SensorArrayState extends State<SensorArray> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Always keep color bar on the left
             ColorScaleBar(
               height: widget.cols * widget.sensorSize + (widget.cols - 1) * 1.8,
             ),
-            // Only flip the grid, not its position
             widget.flipHorizontal
                 ? Transform(
                     alignment: Alignment.center,
