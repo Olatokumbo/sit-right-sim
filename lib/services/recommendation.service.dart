@@ -8,13 +8,15 @@ String generatePrompt(List<PostureStatistics> postures) {
   final buffer = StringBuffer();
 
   var formattedPostures = groupPosture(postures);
-  buffer.writeln('I have been sitting in the following postures for these durations:');
+  buffer.writeln(
+      'I have been sitting in the following postures for these durations:');
 
   for (var posture in formattedPostures) {
     buffer.writeln('${posture.posture} for ${posture.duration} seconds');
   }
 
-  buffer.writeln('Can you provide a brief one-paragraph recommendation (2 sentence max) based on my current sitting posture? Additionally also highlight trends or patterns in my sitting postures');
+  buffer.writeln(
+      'Can you provide a brief one-paragraph recommendation (2 sentence max) based on my current sitting posture? Additionally also highlight trends or patterns in my sitting postures');
 
   return buffer.toString();
 }
@@ -38,7 +40,7 @@ class RecommendationService {
     }
 
     final apiKey = dotenv.env["OPENAI_API_KEY"];
-    const url = 'https://api.openai.com/v1/completions';
+    const url = 'https://api.openai.com/v1/chat/completions';
 
     final headers = {
       'Content-Type': 'application/json',
@@ -46,8 +48,10 @@ class RecommendationService {
     };
 
     final body = jsonEncode({
-      'prompt': generatePrompt(postures),
-      "model": "gpt-3.5-turbo-instruct",
+      'messages': [
+        {"role": "user", "content": generatePrompt(postures)}
+      ],
+      "model": "gpt-4o",
       "temperature": 1,
       "max_tokens": 256,
       "top_p": 1,
@@ -64,11 +68,14 @@ class RecommendationService {
     if (response.statusCode == 200) {
       _counter = 0;
       final data = jsonDecode(response.body);
-      final advise = data['choices'][0]['text'].trim();
-      lastRecommendation = advise;
-      return advise;
-    } else {
-      return "Cannot generate recommendation";
+
+      if (data['choices'] != null && data['choices'].isNotEmpty) {
+        final advise = data['choices'][0]['message']['content']?.trim() ??
+            "No recommendation available";
+        lastRecommendation = advise;
+        return advise;
+      }
     }
+    return "Cannot generate recommendation";
   }
 }
