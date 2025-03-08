@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:sit_right_app/postures/back_leaning_posture.dart';
+import 'package:sit_right_app/postures/empty_posture.dart';
 import 'package:sit_right_app/postures/left_leaning_posture.dart';
 import 'package:sit_right_app/postures/right_leaning_posture.dart';
 import 'package:sit_right_app/postures/slouching_posture.dart';
@@ -20,7 +21,7 @@ class PostureService {
       case "backLeaning":
         return back_leaning[randomNumber];
       default:
-        return {"backrest": [], "seat": []};
+        return empty[0];
     }
   }
 }

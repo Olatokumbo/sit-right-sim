@@ -13,7 +13,7 @@ class SittingStatisticsChart extends StatelessWidget {
     return Column(
       children: [
         Container(
-          height: 300,
+          height: 250,
           padding: const EdgeInsets.all(16),
           child: PieChart(
             PieChartData(

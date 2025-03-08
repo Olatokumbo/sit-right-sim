@@ -7,9 +7,10 @@ import 'package:sit_right_app/components/charts/sitting-statistics.chart.dart';
 import 'package:sit_right_app/components/posture-demo.dart';
 import 'package:sit_right_app/components/posture-indicator.dart';
 import 'package:sit_right_app/components/charts/sitting-quality.chart.dart';
+import 'package:sit_right_app/components/recommendation.component.dart';
 import 'package:sit_right_app/components/simulation-control.component.dart';
 // import 'package:sit_right_app/components/timer.component.dart';
-import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
+// import 'package:sit_right_app/providers/ai-recommendation.provider.dart';
 import 'package:sit_right_app/providers/hausdorff-distance.provider.dart';
 import 'package:sit_right_app/providers/loading.provider.dart';
 import 'package:sit_right_app/providers/predicted-posture.provider.dart';
@@ -21,15 +22,14 @@ import 'package:sit_right_app/models/posture-statistics.model.dart';
 import 'package:sit_right_app/services/weighted-hausdorff-distance.service.dart';
 import 'package:sit_right_app/services/posture.service.dart';
 import 'package:sit_right_app/services/posture-prediction.service.dart';
-import 'package:sit_right_app/services/recommendation.service.dart';
+// import 'package:sit_right_app/services/recommendation.service.dart';
 // import 'package:sit_right_app/services/simulation.service.dart';
 import 'package:sit_right_app/services/sitting-quality.service.dart';
 import 'package:sit_right_app/utils.dart';
-// import "components/dropdown.component.dart";
 import 'components/gauge.component.dart';
 import 'components/sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'providers/ai-recommendation.provider.dart';
 import 'providers/simulation.provider.dart';
 
 // Services
@@ -71,8 +71,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   DateTime startTime = DateTime.now();
 
   List<PostureStatistics> postureStatistics = [];
-  late RecommendationService recommendationService =
-      RecommendationService(postureStatistics);
+
+  void reset() {
+    postureStatistics = [];
+
+    List<List<double>> backrest = postureService.get("empty", 32)["backrest"]!;
+    List<List<double>> seat = postureService.get("empty", 32)["seat"]!;
+
+    ref.read(sensorDataProvider.notifier).state = {
+      "backrest": backrest,
+      "seat": seat
+    };
+    sittingQualityService.reset();
+    ref.read(predictedPostureProvider.notifier).state = "Empty";
+    ref.read(aiRecommendationProvider.notifier).state = "";
+  }
 
   Future<void> setPosture(String value) async {
     final sensorSize = ref.read(sensorSizeProvider);
@@ -92,12 +105,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     String posture = await posturePredictionService
         .fetchPrediction(ref.read(sensorDataProvider));
 
-    String recommendation = await recommendationService.getRecommendations();
+    // String recommendation = await recommendationService.getRecommendations();
     sittingQualityService.calculate(posture, startTime, DateTime.now());
 
     setState(() {
-      if (ref.read(predictedPostureProvider.notifier).state !=
-          "No Posture Detected") {
+      if (ref.read(predictedPostureProvider.notifier).state != "Empty") {
         postureStatistics.add(PostureStatistics(
             ref.read(predictedPostureProvider),
             getScoreByPosture(posture),
@@ -109,12 +121,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     startTime = DateTime.now();
     ref.read(predictedPostureProvider.notifier).state = posture;
     ref.read(simulatedPostureProvider.notifier).state = value;
-    ref.read(aiRecommendationProvider.notifier).state = recommendation;
     ref.read(loadingProvider.notifier).state = false;
 
-    ref.read(hausdorffDistanceProvider.notifier).state =
-        await weightedHausdorffDistanceService.calculate(
-            backrest, seat, sensorSize, postureService);
+    if (posture != "Empty") {
+      ref.read(hausdorffDistanceProvider.notifier).state =
+          await weightedHausdorffDistanceService.calculate(
+              backrest, seat, sensorSize, postureService);
+    }
   }
 
   @override
@@ -122,14 +135,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Get the SimulationService from the provider
       final simulationService = ref.read(simulationServiceProvider);
 
-      // Set the ref and posture change callback
       simulationService.setRef(ref);
       simulationService.setPostureChangeCallback(setPosture);
-
-      setPosture(ref.read(simulatedPostureProvider));
     });
   }
 
@@ -138,8 +147,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final sensorData = ref.watch(sensorDataProvider);
     final sensorSize = ref.watch(sensorSizeProvider);
     final predictedPosture = ref.watch(predictedPostureProvider);
-    // final simulatedPosture = ref.watch(simulatedPostureProvider);
-    final aiRecommendation = ref.watch(aiRecommendationProvider);
     final hausdorffDistance = ref.watch(hausdorffDistanceProvider);
     final loading = ref.watch(loadingProvider);
     final double scoreSum = getScoreByPosture(predictedPosture).abs() +
@@ -179,7 +186,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                   rows: sensorSize,
                                   cols: sensorSize,
                                   sensorSize: 190 / sensorSize,
-                                  sensorValues: sensorData["backrest"] ?? [],
+                                  sensorValues: sensorData["backrest"]!,
                                   flipHorizontal: true,
                                 ),
                                 const SizedBox(height: 10),
@@ -187,7 +194,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                   rows: sensorSize,
                                   cols: sensorSize,
                                   sensorSize: 190 / sensorSize,
-                                  sensorValues: sensorData["seat"] ?? [],
+                                  sensorValues: sensorData["seat"]!,
                                   flipHorizontal: true,
                                 ),
                               ],
@@ -210,43 +217,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                             children: [
                               SimulationControlPanel(
                                 onPostureChange: setPosture,
+                                onReset: reset,
                               ),
-                              // const Divider(),
-                              // const Text("Manual Control:",
-                              //     style:
-                              //         TextStyle(fontWeight: FontWeight.bold)),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.center,
-                              //   children: [
-                              //     DropdownWidget(
-                              //       items: const {
-                              //         "Upright": "upright",
-                              //         "Slouching": "slouching",
-                              //         "Leaning Left": "leftLeaning",
-                              //         "Leaning Right": "rightLeaning",
-                              //         "Leaning Back": "backLeaning"
-                              //       },
-                              //       onValueChanged: (String value) async {
-                              //         setPosture(value);
-                              //       },
-                              //     ),
-                              //     IconButton(
-                              //         onPressed: () async {
-                              //           await setPosture(simulatedPosture);
-                              //         },
-                              //         icon: const Icon(Icons.refresh))
-                              //   ],
-                              // ),
                             ],
                           ),
                         ),
-                        // const Expanded(
-                        //   flex: 1,
-                        //   child: CardComponent(
-                        //     title: "Timer",
-                        //     child: TimerComponent(),
-                        //   ),
-                        // ),
                       ],
                     ),
                   )
@@ -264,7 +239,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(15),
                       margin: const EdgeInsets.all(15),
                       child: DefaultTabController(
                         length: 3,
@@ -327,8 +302,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                           ),
                                         ),
                                         CardComponent(
-                                            title: "AI Recommendation",
-                                            child: Text(aiRecommendation))
+                                          title: "AI Recommendation",
+                                          child: AIRecommendation(
+                                              postureStats: postureStatistics),
+                                        )
                                       ],
                                     ),
                                   ),

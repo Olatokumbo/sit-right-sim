@@ -23,20 +23,13 @@ String generatePrompt(List<PostureStatistics> postures) {
 
 class RecommendationService {
   List<PostureStatistics> postures;
-  int _counter = 0;
   String lastRecommendation = "";
 
   RecommendationService(this.postures);
 
   Future<String> getRecommendations() async {
-    _counter++;
-
     if (postures.isEmpty) {
       return "";
-    }
-
-    if (_counter < 10) {
-      return lastRecommendation;
     }
 
     final apiKey = dotenv.env["OPENAI_API_KEY"];
@@ -66,7 +59,6 @@ class RecommendationService {
     );
 
     if (response.statusCode == 200) {
-      _counter = 0;
       final data = jsonDecode(response.body);
 
       if (data['choices'] != null && data['choices'].isNotEmpty) {

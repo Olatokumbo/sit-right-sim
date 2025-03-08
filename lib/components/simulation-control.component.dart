@@ -9,9 +9,13 @@ import 'simulation-planner.component.dart';
 
 class SimulationControlPanel extends ConsumerWidget {
   final Function(String) onPostureChange;
+  final VoidCallback onReset;
 
-  const SimulationControlPanel({Key? key, required this.onPostureChange})
-      : super(key: key);
+  const SimulationControlPanel({
+    super.key,
+    required this.onPostureChange,
+    required this.onReset,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,6 +38,11 @@ class SimulationControlPanel extends ConsumerWidget {
           _buildCurrentStatus(plan, position, status),
           const SizedBox(height: 10),
           _buildControlButtons(context, ref, simulationService, status),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: onReset,
+            child: const Text("Reset"),
+          ),
         ],
       ),
     );

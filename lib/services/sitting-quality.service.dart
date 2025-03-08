@@ -35,4 +35,9 @@ class SittingQualityService {
     // Log the quality change at the current time
     data.add(SittingQuality(quality, DateTime.now()));
   }
+
+  void reset() {
+    quality = 1;
+    data = [];
+  }
 }

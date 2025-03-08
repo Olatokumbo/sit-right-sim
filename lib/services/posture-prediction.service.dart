@@ -36,7 +36,7 @@ class PosturePredictionService {
           case 4:
             return "Leaning Back";
           default:
-            return "Unknown";
+            return "Empty";
         }
       } else {
         throw Exception(

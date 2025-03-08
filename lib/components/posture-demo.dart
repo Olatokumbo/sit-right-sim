@@ -11,13 +11,14 @@ class PostureDemo extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Image.asset(
-            "./assets/demo-${findPosture(predictedPosture)}.png",
-            height: 400,
+        if (predictedPosture != "Empty")
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Image.asset(
+              "assets/demo-${findPosture(predictedPosture)}.png",
+              height: 400,
+            ),
           ),
-        )
       ],
     );
   }
