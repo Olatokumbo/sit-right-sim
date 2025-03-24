@@ -31,6 +31,7 @@ import 'components/sensor-array.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'providers/ai-recommendation.provider.dart';
 import 'providers/simulation.provider.dart';
+import 'package:sit_right_app/providers/posture-statistics.dart';
 
 // Services
 final postureService = PostureService();
@@ -105,18 +106,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     String posture = await posturePredictionService
         .fetchPrediction(ref.read(sensorDataProvider));
 
-    // String recommendation = await recommendationService.getRecommendations();
     sittingQualityService.calculate(posture, startTime, DateTime.now());
 
-    setState(() {
-      if (ref.read(predictedPostureProvider.notifier).state != "Empty") {
-        postureStatistics.add(PostureStatistics(
-            ref.read(predictedPostureProvider),
-            getScoreByPosture(posture),
-            startTime,
-            DateTime.now()));
-      }
-    });
+    if (ref.read(predictedPostureProvider.notifier).state != "Empty") {
+      final newPostureStats = PostureStatistics(
+          ref.read(predictedPostureProvider),
+          getScoreByPosture(posture),
+          startTime,
+          DateTime.now());
+      
+      // Update posture statistics using the provider
+      ref.read(postureStatisticsProvider.notifier).state = [
+        ...ref.read(postureStatisticsProvider),
+        newPostureStats
+      ];
+    }
 
     startTime = DateTime.now();
     ref.read(predictedPostureProvider.notifier).state = posture;
